@@ -6,9 +6,20 @@ export default class AFD extends Automata{
     super(alphabet)
   }
 
-  addState(stateName, isInitial = false, isFinal =false){
+  addState(stateName,stateId, isInitial = false, isFinal =false){
+    console.log(`${stateName} ${stateId} ${isInitial} ${isFinal}`)
     if(!this.stateExist(stateName)){
-      this.states.push(new State(stateName, isInitial, isFinal))
+      this.states.push(new State(stateName, stateId,isInitial, isFinal))
+    }else{
+      throw new StateAlreadyExistError(stateName)
+    }
+  }
+
+  editState(stateName,stateId, isInitial = false, isFinal =false){
+    console.log(`${stateName} ${stateId} ${isInitial} ${isFinal}`)
+    if(!this.stateExist(stateName)){
+      var temp_state = this.states.filter(e=> e.id ===stateId)[0]
+      temp_state.setValues(stateName,isInitial, isFinal);
     }else{
       throw new StateAlreadyExistError(stateName)
     }
@@ -31,7 +42,6 @@ export default class AFD extends Automata{
           throw new AFDError(fromState, name)
         }
         //console.log(`added ${name} from ${fromStateName} to ${toStateName}`)
-        console.log(id)
         const arrow = new Arrow(name, id, fromState, toState)
         fromState.addRow(arrow)
         this.edges.push(arrow)
@@ -84,10 +94,10 @@ export default class AFD extends Automata{
   }
 
   stateExist(stateName){
-    this.states.forEach(e => {
-      if(e.name == stateName)
-        return true
-    })
+    for(let s of this.states){
+      if(s.name === stateName)
+        return true;
+    }
     return false
   }
 }

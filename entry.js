@@ -51,11 +51,12 @@ function draw() {
       addNode: function (data, callback) {
         // filling in the popup DOM elements
         document.getElementById('node-operation').innerHTML = "Add Node";
-        console.log(data)
+        data.edit = false;
         editNode(data, callback);
       },
       editNode: function (data, callback) {
         // filling in the popup DOM elements
+        data.edit = true;
         document.getElementById('node-operation').innerHTML = "Edit Node";
         editNode(data, callback);
       },
@@ -77,11 +78,13 @@ function draw() {
           }
         }
         document.getElementById('edge-operation').innerHTML = "Add Edge";
+        data.edit = false;
         editEdgeWithoutDrag(data, callback);
       },
       editEdge: {
         editWithoutDrag: function(data, callback) {
           document.getElementById('edge-operation').innerHTML = "Edit Edge";
+          data.edit = true;
           editEdgeWithoutDrag(data,callback);
         }
       },
@@ -133,7 +136,11 @@ function saveNodeData(data, callback) {
     data.color = 'red'
   if(initial && final)
     data.color = 'orange'
-  afd.addState(data.id,initial,final);
+  if(!data.edit)
+    afd.addState(data.label,data.id,initial,final);
+  else {
+    afd.editState(data.label,data.id,initial,final)
+  }
   clearNodePopUp();
   callback(data);
 }
@@ -166,6 +173,7 @@ function saveEdgeData(data, callback) {
   }
   data.label = document.getElementById('edge-label').value;
   data.id = `${data.from}-${data.label}-${data.to}`;
+  console.log(data)
   afd.addArrowToStates(data.label, data.id,data.from, data.to)
   clearEdgePopUp();
   callback(data);

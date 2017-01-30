@@ -45,12 +45,17 @@ export default class Automata{
 
 export class State {
   arrows=[]
-  constructor(name, isInitial = false, isFinal = false ){
+  constructor(name, id, isInitial = false, isFinal = false ){
+    this.id = id
     this.name = name
     this.isInitial = isInitial
     this.isFinal = isFinal
   }
-
+  setValues(name,isInitial, isFinal){
+    this.name = name
+    this.isInitial = isInitial
+    this.isFinal = isFinal
+  }
   addRow(arrow){
     //console.log(`arrow ${arrow.name} added to ${this.name}`)
     //console.log(`arrow from ${arrow.from.name} to ${arrow.to.name}`)
