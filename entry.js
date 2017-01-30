@@ -79,12 +79,16 @@ function draw() {
         }
         document.getElementById('edge-operation').innerHTML = "Add Edge";
         data.edit = false;
+        console.log("Adding in")
+        console.log(data)
         editEdgeWithoutDrag(data, callback);
       },
       editEdge: {
         editWithoutDrag: function(data, callback) {
           document.getElementById('edge-operation').innerHTML = "Edit Edge";
           data.edit = true;
+          console.log("editing in")
+          console.log(data)
           editEdgeWithoutDrag(data,callback);
         }
       },
@@ -172,9 +176,15 @@ function saveEdgeData(data, callback) {
     data.from = data.from.id
   }
   data.label = document.getElementById('edge-label').value;
-  data.id = `${data.from}-${data.label}-${data.to}`;
   console.log(data)
-  afd.addArrowToStates(data.label, data.id,data.from, data.to)
+  if(!data.edit){
+    data.id = Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);//`${data.from}-${data.label}-${data.to}`;
+    afd.addArrowToStates(data.label, data.id,data.from, data.to)
+  }else{
+    afd.editArrowName(data.label, data.id)
+  }
   clearEdgePopUp();
   callback(data);
 }

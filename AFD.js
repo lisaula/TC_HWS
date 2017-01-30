@@ -8,7 +8,7 @@ export default class AFD extends Automata{
 
   addState(stateName,stateId, isInitial = false, isFinal =false){
     console.log(`${stateName} ${stateId} ${isInitial} ${isFinal}`)
-    if(!this.stateExist(stateName)){
+    if(!this.stateExist(stateName, stateId)){
       this.states.push(new State(stateName, stateId,isInitial, isFinal))
     }else{
       throw new StateAlreadyExistError(stateName)
@@ -17,7 +17,7 @@ export default class AFD extends Automata{
 
   editState(stateName,stateId, isInitial = false, isFinal =false){
     console.log(`${stateName} ${stateId} ${isInitial} ${isFinal}`)
-    if(!this.stateExist(stateName)){
+    if(!this.stateExist(stateName, stateId)){
       var temp_state = this.states.filter(e=> e.id ===stateId)[0]
       temp_state.setValues(stateName,isInitial, isFinal);
     }else{
@@ -25,10 +25,10 @@ export default class AFD extends Automata{
     }
   }
 
-  addArrowToStates(name, id, fromStateName, toStateName){
+  addArrowToStates(name, id, fromStateId, toStateId){
 
-    const fromState = this.states.filter(e => e.name == fromStateName)[0]
-    const toState = this.states.filter(e => e.name == toStateName)[0]
+    const fromState = this.states.filter(e => e.id == fromStateId)[0]
+    const toState = this.states.filter(e => e.id == toStateId)[0]
     //console.log(`adding ${name} from ${fromStateName} to ${toStateName}`)
 
     if(!fromState)
@@ -38,7 +38,7 @@ export default class AFD extends Automata{
       throw new StateNotFoundError(toStateName)
 
     if(this.arrowNameExistInAlphabet(name)){
-        if(!this.arrowNotExistInState(fromState, name)){
+        if(this.arrowExistInState(fromState, name)){
           throw new AFDError(fromState, name)
         }
         //console.log(`added ${name} from ${fromStateName} to ${toStateName}`)
@@ -46,6 +46,19 @@ export default class AFD extends Automata{
         fromState.addRow(arrow)
         this.edges.push(arrow)
     }
+  }
+
+  editArrowName(name, id){
+    let temp = this.edges.filter(e=> e.id == id)[0]
+    let state = temp.from
+    if(!this.arrowExistInState(state, name)){
+      temp.name = name
+      let temp2 = temp.from.arrows.filter(e => e.id = id)[0]
+      temp2.name = name
+    }else{
+      throw new AFDError(state, name);
+    }
+
   }
 
   removeStateFromArray(id){
@@ -77,13 +90,13 @@ export default class AFD extends Automata{
     return currentState.isFinal
   }
 
-  arrowNotExistInState(state, arrowName){
-    return !state.arrows.filter(a => {
-      if(a.name ==arrowName)
+  arrowExistInState(state, arrowName){
+    for(let a of state.arrows){
+      console.log(`name: ${a.name} - arrowname: ${arrowName}`)
+      if(a.name === arrowName)
         return true
-
-      return false
-    }).length
+    }
+    return false
   }
   arrowNameExistInAlphabet(name){
     name.split("|").forEach(c => {
@@ -93,9 +106,9 @@ export default class AFD extends Automata{
     return true
   }
 
-  stateExist(stateName){
+  stateExist(stateName, stateId){
     for(let s of this.states){
-      if(s.name === stateName)
+      if(s.name === stateName && s.id !== stateId)
         return true;
     }
     return false
