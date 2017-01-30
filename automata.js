@@ -1,14 +1,12 @@
 export default class Automata{
   states = []
   alphabet = undefined
-  constructor(alphabet){
-    this.setAlphabet(alphabet)
-  }
+  constructor(){}
 
   setAlphabet(alphabet){
+    this.alphabet = null;
     this.alphabet = new Set()
-    for(let a of alphabet){
-      if(a !== ',' || a !== '{' || a !== '}')
+    for(let a of alphabet.split(",")){
         this.alphabet.add(a)
     }
   }

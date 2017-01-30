@@ -1,8 +1,136 @@
+<!DOCTYPE html>
+
 <html>
-    <head>
-        <meta charset="utf-8">
-    </head>
-    <body>
-        <script type="text/javascript" src="bundle.js" charset="utf-8"></script>
-    </body>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title>Automatas</title>
+		<script src="./node_modules/vis/dist/vis.js"></script>
+		<link rel="stylesheet" href="./node_modules/vis/dist/vis.css" />
+		<style>
+    body, select {
+    font: 10pt sans;
+  }
+  #mynetwork {
+    position:relative;
+    width: 800px;
+    height: 600px;
+    border: 1px solid lightgray;
+  }
+  table.legend_table {
+    font-size: 11px;
+    border-width:1px;
+    border-color:#d3d3d3;
+    border-style:solid;
+  }
+  table.legend_table,td {
+    border-width:1px;
+    border-color:#d3d3d3;
+    border-style:solid;
+    padding: 2px;
+  }
+  div.table_content {
+    width:80px;
+    text-align:center;
+  }
+  div.table_description {
+    width:100px;
+  }
+
+  #operation {
+    font-size:28px;
+  }
+  #alphabet{
+    margin-top: : 3%;
+    margin-bottom: 3%;
+    width: 250px;
+  }
+  #W{
+    margin-left: 5%;
+    margin-top: : 3%;
+    margin-bottom: 3%;
+    width: 250px;
+  }
+  #node-popUp {
+    display:none;
+    position:absolute;
+    top:350px;
+    left:170px;
+    z-index:299;
+    width:250px;
+    height:150px;
+    background-color: #f9f9f9;
+    border-style:solid;
+    border-width:3px;
+    border-color: #5394ed;
+    padding:10px;
+    text-align: center;
+  }
+  #edge-popUp {
+    display:none;
+    position:absolute;
+    top:350px;
+    left:170px;
+    z-index:299;
+    width:250px;
+    height:90px;
+    background-color: #f9f9f9;
+    border-style:solid;
+    border-width:3px;
+    border-color: #5394ed;
+    padding:10px;
+    text-align: center;
+  }
+  #execButton {
+    background-color: #4CAF50; /* Green */
+    margin-top: 10px;
+    margin-bottom: 15px;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+		</style>
+	</head>
+	<body id="body">
+    <h2>AFD</h2>
+    Alphabet: <input type="text" id="alphabet" placeholder="0,1"><br>
+    W: <input type="text" id="W" placeholder="011001"><br>
+    <input type="button" id="execButton" value="Exec">
+    <div id="node-popUp">
+      <span id="node-operation">node</span> <br>
+      <table style="margin:auto;">
+        <tr>
+          <td>id</td><td><input id="node-id" value="new value" /></td>
+        </tr>
+        <tr>
+          <td>label</td><td><input id="node-label" value="new value" /></td>
+        </tr>
+        <tr>
+          <td>Initial:</td><td> <input type="checkbox" id="isInitial" value="Initial"  /></td>
+        </tr>
+        <tr>
+          <td>Final:</td><td> <input type="checkbox" id="isFinal" value="Final"  /></td>
+        </tr>
+      </table>
+      <input type="button" value="save" id="node-saveButton" />
+      <input type="button" value="cancel" id="node-cancelButton" />
+    </div>
+
+    <div id="edge-popUp">
+      <span id="edge-operation">edge</span> <br>
+      <table style="margin:auto;">
+        <tr>
+          <td>label</td><td><input id="edge-label" value="new value" /></td>
+        </tr></table>
+      <input type="button" value="save" id="edge-saveButton" />
+      <input type="button" value="cancel" id="edge-cancelButton" />
+    </div>
+    <br />
+    <div id="mynetwork"></div>
+		<script src="bundle.js"></script>
+	</body>
 </html>
