@@ -1,5 +1,6 @@
 export default class Automata{
   states = []
+  edges=[]
   alphabet = undefined
   constructor(){}
 
@@ -28,6 +29,18 @@ export default class Automata{
       }
     })
   }
+
+  removeByAttr(arr, attr, value){
+    var i = arr.length;
+    while(i--){
+       if( arr[i]
+           && arr[i].hasOwnProperty(attr)
+           && (arguments.length > 2 && arr[i][attr] === value ) ){
+           arr.splice(i,1);
+       }
+    }
+    return arr;
+  }
 }
 
 export class State {
@@ -39,14 +52,28 @@ export class State {
   }
 
   addRow(arrow){
-    console.log(`arrow ${arrow.name} added to ${this.name}`)
-    console.log(`arrow from ${arrow.from.name} to ${arrow.to.name}`)
+    //console.log(`arrow ${arrow.name} added to ${this.name}`)
+    //console.log(`arrow from ${arrow.from.name} to ${arrow.to.name}`)
     this.arrows.push(arrow)
+  }
+
+  removeByAttr(attr, value){
+    var i = this.arrows.length;
+    while(i--){
+       if( this.arrows[i]
+           && this.arrows[i].hasOwnProperty(attr)
+           && (arguments.length > 2 && this.arrows[i][attr] === value ) ){
+           this.arrows.splice(i,1);
+       }
+    }
+    this.arrows =this.arrows;
   }
 }
 
 export class Arrow{
-  constructor(name, from, to){
+  constructor(name, id, from, to){
+    console.log(id)
+    this.id = id
     this.name =name
     this.from = from
     this.to = to

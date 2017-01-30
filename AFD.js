@@ -14,10 +14,12 @@ export default class AFD extends Automata{
     }
   }
 
-  addArrowToStates(name, fromStateName, toStateName){
+  addArrowToStates(name, id, fromStateName, toStateName){
+
     const fromState = this.states.filter(e => e.name == fromStateName)[0]
     const toState = this.states.filter(e => e.name == toStateName)[0]
-    console.log(`adding ${name} from ${fromStateName} to ${toStateName}`)
+    //console.log(`adding ${name} from ${fromStateName} to ${toStateName}`)
+
     if(!fromState)
       throw new StateNotFoundError(fromStateName)
 
@@ -28,9 +30,26 @@ export default class AFD extends Automata{
         if(!this.arrowNotExistInState(fromState, name)){
           throw new AFDError(fromState, name)
         }
-        console.log(`added ${name} from ${fromStateName} to ${toStateName}`)
-        fromState.addRow(new Arrow(name, fromState, toState))
+        //console.log(`added ${name} from ${fromStateName} to ${toStateName}`)
+        console.log(id)
+        const arrow = new Arrow(name, id, fromState, toState)
+        fromState.addRow(arrow)
+        this.edges.push(arrow)
     }
+  }
+
+  removeStateFromArray(id){
+    const array = this.states.filter(e => e.name !==id)
+    this.states = array;
+  }
+
+  removeEdgeFromArray(id){
+    let s = this.edges.filter(e=> e.id == id)[0].from;
+    const temp_edges =this.edges.filter(e => e.id !== id);
+    this.edges = temp_edges;
+    const state = this.states.filter(e => e.name == s.name)[0]
+    const temp_array = state.arrows.filter(e=> e.id !==id )
+    state.arrows=temp_array;
   }
 
   consume(w){
@@ -52,7 +71,7 @@ export default class AFD extends Automata{
     return !state.arrows.filter(a => {
       if(a.name ==arrowName)
         return true
-        
+
       return false
     }).length
   }
