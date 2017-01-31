@@ -214,8 +214,13 @@ input.addEventListener('input', function() {
 function handleClick() {
   try{
     let result = afd.consume(document.getElementById('W').value)
-    let msg = result? "The W was accepted": "The W is not accepted";
-    confirm(msg)
+    if(result){
+      document.getElementById('message').style.color = "green";
+      document.getElementById('message').innerHTML = "The W was accepted"
+    }else{
+      document.getElementById('message').style.color = "red";
+      document.getElementById('message').innerHTML = "The W was denied"
+    }
   }catch(err){
     confirm(err.message)
   }

@@ -92,7 +92,12 @@
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
-}
+	}
+	#message {
+			color:green;
+			font-size: 20px;
+			font-weight: bold;
+	}
 		</style>
 	</head>
 	<body id="body">
@@ -100,6 +105,7 @@
     Alphabet: <input type="text" id="alphabet" placeholder="0,1"><br>
     W: <input type="text" id="W" placeholder="011001"><br>
     <input type="button" id="execButton" value="Exec">
+		<div id="message"></div>
     <div id="node-popUp">
       <span id="node-operation">node</span> <br>
       <table style="margin:auto;">
