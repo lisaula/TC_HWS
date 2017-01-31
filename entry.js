@@ -2,22 +2,6 @@ import AFD from "./AFD.js"
 import expect from 'expect'
 let afd = undefined;
 
-function newState(state, isInitial, isFinal){
-  afd.addState(state, isInitial, isFinal)
-}
-
-function newArrow(name, fromName, toName){
-  afd.addArrowToStates(name,fromName, toName)
-}
-
-function consume(w){
-  return afd.consume(w);
-}
-
-function imprimir(algo){
-  console.log(algo)
-}
-
 var nodes = [];
 var edges = [];
 var network = null;
@@ -61,13 +45,17 @@ function draw() {
         editNode(data, callback);
       },
       deleteNode: function (data, callback){
-        for(let a of data.edges){
-          afd.removeEdgeFromArray(a)
+        try{
+          for(let a of data.edges){
+            afd.removeEdgeFromArray(a)
+          }
+          for(let a of data.nodes){
+            afd.removeStateFromArray(a);
+          }
+          callback(data);
+        }catch(err){
+          confirm(err.message)
         }
-        for(let a of data.nodes){
-          afd.removeStateFromArray(a);
-        }
-        callback(data);
       },
       addEdge: function (data, callback) {
         if (data.from == data.to) {
@@ -93,14 +81,18 @@ function draw() {
         }
       },
       deleteEdge: function (data, callback){
-        for(let a of data.edges){
-          afd.removeEdgeFromArray(a)
+        try{
+          for(let a of data.edges){
+            afd.removeEdgeFromArray(a)
+          }
+          for(let a of data.nodes){
+            afd.removeStateFromArray(a);
+          }
+          //afd.removeEdgeFromArray(data.id)
+          callback(data);
+        }catch(err){
+          confirm(err.message)
         }
-        for(let a of data.nodes){
-          afd.removeStateFromArray(a);
-        }
-        //afd.removeEdgeFromArray(data.id)
-        callback(data);
       }
     }
   };
@@ -140,13 +132,17 @@ function saveNodeData(data, callback) {
     data.color = 'red'
   if(initial && final)
     data.color = 'orange'
-  if(!data.edit)
-    afd.addState(data.label,data.id,initial,final);
-  else {
-    afd.editState(data.label,data.id,initial,final)
+  try{
+    if(!data.edit){
+      afd.addState(data.label,data.id,initial,final);
+    }else {
+      afd.editState(data.label,data.id,initial,final)
+    }
+    clearNodePopUp();
+    callback(data);
+  }catch(err){
+    confirm(err.message)
   }
-  clearNodePopUp();
-  callback(data);
 }
 
 function editEdgeWithoutDrag(data, callback) {
@@ -176,21 +172,30 @@ function saveEdgeData(data, callback) {
     data.from = data.from.id
   }
   data.label = document.getElementById('edge-label').value;
-  console.log(data)
-  if(!data.edit){
-    data.id = Math.floor((1 + Math.random()) * 0x10000)
-      .toString(16)
-      .substring(1);//`${data.from}-${data.label}-${data.to}`;
-    afd.addArrowToStates(data.label, data.id,data.from, data.to)
-  }else{
-    afd.editArrowName(data.label, data.id)
+  //console.log(data)
+  try{
+    if(!data.edit){
+      data.id = Math.floor((1 + Math.random()) * 0x10000)
+        .toString(16)
+        .substring(1);//`${data.from}-${data.label}-${data.to}`;
+
+      afd.addArrowToStates(data.label, data.id,data.from, data.to)
+    }else{
+      afd.editArrowName(data.label, data.id)
+    }
+    clearEdgePopUp();
+    callback(data);
+  }catch(err){
+    confirm(err.message)
   }
-  clearEdgePopUp();
-  callback(data);
 }
 function init() {
   draw();
+  try{
   afd = new AFD()
+}catch(err){
+  confirm(err.message)
+}
 }
 
 var body = document.getElementById('body');
@@ -207,7 +212,11 @@ input.addEventListener('input', function() {
 })
 
 function handleClick() {
-  let result = afd.consume(document.getElementById('W').value)
-  let msg = result? "The W was accepted": "The W is not accepted";
-  confirm(msg)
+  try{
+    let result = afd.consume(document.getElementById('W').value)
+    let msg = result? "The W was accepted": "The W is not accepted";
+    confirm(msg)
+  }catch(err){
+    confirm(err.message)
+  }
 }

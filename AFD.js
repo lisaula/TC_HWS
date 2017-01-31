@@ -58,7 +58,6 @@ export default class AFD extends Automata{
     }else{
       throw new AFDError(state, name);
     }
-
   }
 
   removeStateFromArray(id){
