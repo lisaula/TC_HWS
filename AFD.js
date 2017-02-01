@@ -1,7 +1,6 @@
 import Automata, {State, Arrow} from "./automata.js"
 import {StateAlreadyExistError, StateNotFoundError, CharNotFoundError, AFDError, noArrowError} from "./errors.js"
 export default class AFD extends Automata{
-  states = []
   constructor(alphabet){
     super(alphabet)
   }
@@ -99,19 +98,5 @@ export default class AFD extends Automata{
     }
     return false
   }
-  arrowNameExistInAlphabet(name){
-    name.split("|").forEach(c => {
-      if(!this.alphabet.has(c))
-        throw new CharNotFoundError(c)
-    })
-    return true
-  }
 
-  stateExist(stateName, stateId){
-    for(let s of this.states){
-      if(s.name === stateName && s.id !== stateId)
-        return true;
-    }
-    return false
-  }
 }

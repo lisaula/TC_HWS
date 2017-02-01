@@ -1,6 +1,31 @@
 import AFD from "./AFD.js"
 import expect from 'expect'
-let afd = undefined;
+import AFN from "./AFN.js"
+
+const afn = new AFN()
+afn.setAlphabet("0,1")
+afn.addState("q0","q0",true,false)
+afn.addState("q1","q1",false,false)
+afn.addState("q2","q2",false,true)
+
+afn.addArrowToStates("0|1", "0|1", "q0", "q0")
+afn.addArrowToStates("0", "0", "q0", "q1")
+afn.addArrowToStates("1", "1", "q1", "q2")
+
+console.log(afn.consume("1001", afn.getInitialState()))
+/*let algo = "hola"
+let len = algo.length
+let i = 0
+while(i<len){
+  i=i+1
+  if(algo.length>0){
+    algo = algo.substring(1,algo.length)
+    console.log(algo)
+  }else {
+    break;
+  }
+}*/
+/*let afd = undefined;
 
 var nodes = [];
 var edges = [];
@@ -224,4 +249,4 @@ function handleClick() {
   }catch(err){
     confirm(err.message)
   }
-}
+}*/

@@ -1,3 +1,4 @@
+import {CharNotFoundError} from "./errors.js"
 export default class Automata{
   states = []
   edges=[]
@@ -40,6 +41,22 @@ export default class Automata{
        }
     }
     return arr;
+  }
+
+  stateExist(stateName, stateId){
+    for(let s of this.states){
+      if(s.name === stateName && s.id !== stateId)
+        return true;
+    }
+    return false
+  }
+
+  arrowNameExistInAlphabet(name){
+    name.split("|").forEach(c => {
+      if(!this.alphabet.has(c))
+        throw new CharNotFoundError(c)
+    })
+    return true
   }
 }
 
