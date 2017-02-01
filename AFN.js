@@ -47,7 +47,7 @@ export default class AFN extends Automata{
                   returnValue = this.consume(w.substring(1, w.length),t_s)
               }
               return returnValue;
-            }
+            }arrows
           }else {
             return state.isFinal;
           }
