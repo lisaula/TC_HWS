@@ -51,12 +51,14 @@ export default class AFD extends Automata{
   editArrowName(name, id){
     let temp = this.edges.filter(e=> e.id == id)[0]
     let state = temp.from
-    if(!this.arrowExistInState(state, name)){
-      temp.name = name
-      let temp2 = temp.from.arrows.filter(e => e.id = id)[0]
-      temp2.name = name
-    }else{
-      throw new AFDError(state, name);
+    if(this.arrowNameExistInAlphabet(name)){
+      if(!this.arrowExistInState(state, name)){
+        temp.name = name
+        let temp2 = temp.from.arrows.filter(e => e.id = id)[0]
+        temp2.name = name
+      }else{
+        throw new AFDError(state, name);
+      }
     }
   }
 
