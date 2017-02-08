@@ -81,7 +81,7 @@
     padding:10px;
     text-align: center;
   }
-  #execButton {
+  #execButton,#execFromNFAToDFAButton {
     background-color: #4CAF50; /* Green */
     margin-top: 10px;
     margin-bottom: 15px;
@@ -101,10 +101,16 @@
 		</style>
 	</head>
 	<body id="body">
-    <h2>AFD</h2>
+    <h2>AFN</h2>
     Alphabet: <input type="text" id="alphabet" placeholder="0,1"><br>
     W: <input type="text" id="W" placeholder="011001"><br>
+		<form>
+	 		<input type="radio" name="automata" id="DFA" value="DFA" checked> DFA<br>
+	 		<input type="radio" name="automata" id="NFA"value="NFA"> NFA<br>
+	 		<input type="radio" name="automata" id="NFA-E"value="NFA-E"> NFA-E<br>
+		</form>
     <input type="button" id="execButton" value="Exec">
+		<input type="button" id="execFromNFAToDFAButton" value="From NFA to DFA">
 		<div id="message"></div>
     <div id="node-popUp">
       <span id="node-operation">node</span> <br>

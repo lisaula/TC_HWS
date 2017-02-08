@@ -51,6 +51,14 @@ export default class Automata{
     return false
   }
 
+  stateNameExist(stateName){
+    for(let s of this.states){
+      if(s.name === stateName)
+        return true;
+    }
+    return false
+  }
+
   arrowNameExistInAlphabet(name){
     name.split("|").forEach(c => {
       if(!this.alphabet.has(c))
@@ -104,6 +112,14 @@ export class Arrow{
   validate(a){
     for(let n of this.name.split("|")){
       if(a == n)
+        return true;
+    }
+    return false;
+  }
+
+  validateEpsilon(a){
+    for(let n of this.name.split("|")){
+      if(a == n || n =="e")
         return true;
     }
     return false;

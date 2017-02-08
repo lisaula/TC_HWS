@@ -1,6 +1,7 @@
 import Automata, {State, Arrow} from "./automata.js"
 import {StateAlreadyExistError} from "./errors.js"
-export default class AFN extends Automata{
+
+export default class AFNE extends Automata{
   constructor(){
     super()
   }
@@ -9,7 +10,7 @@ export default class AFN extends Automata{
     if(this.stateExist(stateName, stateId)){
       throw new StateAlreadyExistError(stateName)
     }
-      this.states.push(new State(stateName, stateId, isInitial, isFinal));
+    this.states.push(new State(stateName, stateId, isInitial, isFinal));
   }
 
   addArrowToStates(name, id, fromStateId, toStateId){
@@ -63,17 +64,23 @@ export default class AFN extends Automata{
     }
   }
 
-  consume(w, state){
+claura(state){
+  return state.arrows.filter(e=>e.validateEpsilon());
+}
+  consume(w, states){
     console.log(`W: ${w} - len: ${w.length} state: ${state.name}`)
+
     if(w.length>0){
         let a = w.charAt(0)
         if(this.arrowNameExistInAlphabet(a)){
-          let arrows = state.arrows.filter(e => e.validate(a))
+          let arrows []
+
           if(arrows){
             let transitionStates = []
             for(let arrow of arrows){
               transitionStates.push(arrow.to)
             }
+            transitionStates.push(state)
             if(transitionStates){
               let returnValue =false;
               for(let t_s of transitionStates){
@@ -89,6 +96,7 @@ export default class AFN extends Automata{
       }
       return state.isFinal;
   }
+
 
   getInitialState(){
     return this.states.filter(e => e.isInitial)[0]

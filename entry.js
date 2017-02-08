@@ -2,38 +2,22 @@ import AFD from "./AFD.js"
 import expect from 'expect'
 import AFN from "./AFN.js"
 
-const afn = new AFN()
-afn.setAlphabet("0,1")
-afn.addState("q0","q0",true,false)
-afn.addState("q1","q1",false,false)
-afn.addState("q2","q2",false,true)
-
-afn.addArrowToStates("0|1", "0|1", "q0", "q0")
-afn.addArrowToStates("0", "0", "q0", "q1")
-afn.addArrowToStates("1", "1", "q1", "q2")
-
-console.log(afn.consume("1001", afn.getInitialState()))
-/*let algo = "hola"
-let len = algo.length
-let i = 0
-while(i<len){
-  i=i+1
-  if(algo.length>0){
-    algo = algo.substring(1,algo.length)
-    console.log(algo)
-  }else {
-    break;
-  }
-}*/
-/*let afd = undefined;
-
+let afn = undefined;
+let afd = undefined;
 var nodes = [];
 var edges = [];
 var network = null;
+
+var DFARadio = document.getElementById('DFA');
+var NFARadio = document.getElementById('NFA');
+var NFAERadio = document.getElementById('NFA-E');
+
+import {setStateTable, getNewDFAFromNFA} from "./Utils.js"
+
 // randomly create some nodes and edges
-const data = {
-  nodes: nodes,
-  edges: edges
+var data = {
+  nodes: [],
+  edges: []
 }
 
 function destroy() {
@@ -45,11 +29,6 @@ function destroy() {
 
 function draw() {
   destroy();
-  nodes = new vis.DataSet([]);
-  edges = new vis.DataSet([]);
-
-  // create a network
-  const container = document.getElementById('mynetwork');
   const options = {
     edges:{
       arrows: {
@@ -72,10 +51,16 @@ function draw() {
       deleteNode: function (data, callback){
         try{
           for(let a of data.edges){
-            afd.removeEdgeFromArray(a)
+            if(DFARadio.checked)
+              afd.removeEdgeFromArray(a)
+            else if(NFARadio.checked)
+              afn.removeEdgeFromArray(a)
           }
           for(let a of data.nodes){
-            afd.removeStateFromArray(a);
+            if(DFARadio.checked)
+              afd.removeStateFromArray(a);
+            else if(NFARadio.checked)
+              afn.removeStateFromArray(a);
           }
           callback(data);
         }catch(err){
@@ -108,10 +93,16 @@ function draw() {
       deleteEdge: function (data, callback){
         try{
           for(let a of data.edges){
-            afd.removeEdgeFromArray(a)
+            if(DFARadio.checked)
+              afd.removeEdgeFromArray(a)
+            else if(NFARadio.checked)
+              afn.removeEdgeFromArray(a)
           }
           for(let a of data.nodes){
-            afd.removeStateFromArray(a);
+            if(DFARadio.checked)
+              afd.removeStateFromArray(a);
+            else if(NFARadio.checked)
+              afn.removeStateFromArray(a);
           }
           //afd.removeEdgeFromArray(data.id)
           callback(data);
@@ -121,6 +112,7 @@ function draw() {
       }
     }
   };
+  const container = document.getElementById('mynetwork');
   network = new vis.Network(container, data, options);
 }
 
@@ -159,9 +151,15 @@ function saveNodeData(data, callback) {
     data.color = 'orange'
   try{
     if(!data.edit){
-      afd.addState(data.label,data.id,initial,final);
+      if(DFARadio.checked)
+        afd.addState(data.label,data.id,initial,final);
+      else if(NFARadio.checked)
+        afn.addState(data.label,data.id,initial,final);
     }else {
-      afd.editState(data.label,data.id,initial,final)
+      if(DFARadio.checked)
+        afd.editState(data.label,data.id,initial,final)
+      else if(NFARadio.checked)
+        afn.editState(data.label,data.id,initial,final)
     }
     clearNodePopUp();
     callback(data);
@@ -204,9 +202,15 @@ function saveEdgeData(data, callback) {
         .toString(16)
         .substring(1);//`${data.from}-${data.label}-${data.to}`;
 
-      afd.addArrowToStates(data.label, data.id,data.from, data.to)
+      if(DFARadio.checked)
+        afd.addArrowToStates(data.label, data.id,data.from, data.to)
+      else if(NFARadio.checked)
+        afn.addArrowToStates(data.label, data.id,data.from, data.to)
     }else{
-      afd.editArrowName(data.label, data.id)
+      if(DFARadio.checked)
+        afd.editArrowName(data.label, data.id)
+      else if(NFARadio.checked)
+        afn.editArrowName(data.label, data.id)
     }
     clearEdgePopUp();
     callback(data);
@@ -217,6 +221,7 @@ function saveEdgeData(data, callback) {
 function init() {
   draw();
   try{
+  afn = new AFN()
   afd = new AFD()
 }catch(err){
   confirm(err.message)
@@ -233,20 +238,59 @@ button.addEventListener('click', () => {
 
 let input = document.getElementById('alphabet');
 input.addEventListener('input', function() {
-  afd.setAlphabet(input.value)
+  if(DFARadio.checked)
+    afd.setAlphabet(input.value)
+  else if(NFARadio.checked)
+    afn.setAlphabet(input.value)
 })
 
+
 function handleClick() {
-  try{
-    let result = afd.consume(document.getElementById('W').value)
+  //try{
+    let result = false;
+    if(DFARadio.checked){
+      result = afd.consume(document.getElementById('W').value);
+    }else if(NFARadio){
+      result =afn.consume(document.getElementById('W').value, afn.getInitialState())
+    }
     if(result){
       document.getElementById('message').style.color = "green";
-      document.getElementById('message').innerHTML = "The W was accepted"
+      document.getElementById('message').innerHTML = "The value of W was accepted"
     }else{
       document.getElementById('message').style.color = "red";
-      document.getElementById('message').innerHTML = "The W was denied"
+      document.getElementById('message').innerHTML = "The value of W was denied"
     }
-  }catch(err){
-    confirm(err.message)
+  //}catch(err){
+    //confirm(err.message+err.)
+  //}
+}
+
+let execFromNFAToDFAButton = document.getElementById('execFromNFAToDFAButton');
+execFromNFAToDFAButton.addEventListener('click', () => {
+    handleFromNFAToDFAButton(); // (A)
+});
+function handleFromNFAToDFAButton(){
+  setStateTable(afn)
+  let newDataSet= getNewDFAFromNFA()
+  afd.setAlphabet(input.value)
+  for(let stateObj of newDataSet.nodes){
+    let initial = false, final = false
+    if(stateObj.color == 'lime' || stateObj.color == 'orange'){
+      initial=true
+    }
+    if(stateObj.color == 'red' || stateObj.color == 'orange'){
+      final = true
+    }
+    afd.addState(stateObj.label, stateObj.id,initial, final )
   }
-}*/
+
+  for(let edgesObj of newDataSet.edges){
+    let id = Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
+    afd.addArrowToStates(edgesObj.label,id,edgesObj.from,edgesObj.to)
+  }
+  data = null
+  data = newDataSet;
+  draw()
+}
