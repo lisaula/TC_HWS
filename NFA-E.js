@@ -64,39 +64,59 @@ export default class AFNE extends Automata{
     }
   }
 
-claura(state){
-  return state.arrows.filter(e=>e.validateEpsilon());
-}
-  consume(w, states){
-    console.log(`W: ${w} - len: ${w.length} state: ${state.name}`)
-
-    if(w.length>0){
-        let a = w.charAt(0)
-        if(this.arrowNameExistInAlphabet(a)){
-          let arrows []
-
-          if(arrows){
-            let transitionStates = []
-            for(let arrow of arrows){
-              transitionStates.push(arrow.to)
-            }
-            transitionStates.push(state)
-            if(transitionStates){
-              let returnValue =false;
-              for(let t_s of transitionStates){
-                if(!returnValue)
-                  returnValue = this.consume(w.substring(1, w.length),t_s)
-              }
-              return returnValue;
-            }
-          }else {
-            return false;
-          }
-        }
+  clausura(state){
+    let array = []
+    array.push(state)
+    let arrows = state.arrows.filter(e=>e.validateEpsilon());
+    if(arrows){
+      for(let a of arrows){
+        array.push.apply(array,this.clausura(a.to))
       }
-      return state.isFinal;
+    }
+    return this.removeDuplicates(array);
   }
 
+  consume(w, states){
+    if(w.length>0){
+      let a = w.charAt(0)
+      let arrows =[]
+      states.forEach( e => {
+        arrows.push.apply(arrows, e.arrows.filter(e => e.validate(a)));
+      })
+      if(arrows){
+        let transitionStates = []
+        for(let arrow of arrows){
+          transitionStates.push(arrow.to)
+        }
+        if(transitionStates){
+          let statesWithClosing = []
+          transitionStates.forEach(ts => {
+            statesWithClosing.push.apply(statesWithClosing,this.clausura(ts))
+          })
+          statesWithClosing= this.removeDuplicates(statesWithClosing)
+          return this.consume(w.substring(1, w.length),statesWithClosing)
+        }
+      }else{
+        return false
+      }
+    }else{
+      return this.evaluateIfFinals(states)
+    }
+  }
+
+  removeDuplicates(states){
+    let nuevo =[]
+    states.forEach( x => nuevo.indexOf(x) < 0? nuevo.push(x): null);
+    return nuevo
+  }
+
+  evaluateIfFinals(states){
+    for(let s of states){
+      if(s.isFinal)
+        return true
+    }
+    return false
+  }
 
   getInitialState(){
     return this.states.filter(e => e.isInitial)[0]

@@ -119,7 +119,7 @@ function getAllTransitionsStates(afn,stateName, a){
 }
 
 function removeDuplicates(statesName){
-  console.log(`remove dupli ${statesName}`)
+  //console.log(`remove dupli ${statesName}`)
   let array = statesName.split(",")
   let nuevo = [];
 	array.forEach( x => nuevo.indexOf(x) < 0 ? nuevo.push(x) : null);

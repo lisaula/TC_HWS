@@ -117,9 +117,9 @@ export class Arrow{
     return false;
   }
 
-  validateEpsilon(a){
+  validateEpsilon(){
     for(let n of this.name.split("|")){
-      if(a == n || n =="e")
+      if(n =="e")
         return true;
     }
     return false;

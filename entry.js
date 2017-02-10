@@ -1,16 +1,36 @@
 import AFD from "./AFD.js"
 import expect from 'expect'
 import AFN from "./AFN.js"
-
+import AFNE from "./NFA-E.js"
 let afn = undefined;
 let afd = undefined;
+//------------------------------------------
+let afn_e = undefined;
+/*afn_e.setAlphabet("a,e")
+afn_e.addState("p", "p",true,false)
+afn_e.addState("q", "q",false,false)
+afn_e.addState("r", "r",false,false)
+afn_e.addState("q1", "q1",false,false)
+afn_e.addState("r1", "r1",false,false)
+afn_e.addState("r2", "r2",false,true)
+
+afn_e.addArrowToStates("e","e","p","q")
+afn_e.addArrowToStates("e","e(0)","p","r")
+afn_e.addArrowToStates("e","e(1)","r","r2")
+afn_e.addArrowToStates("a","a1","q","q1")
+afn_e.addArrowToStates("a","a2","q1","q")
+afn_e.addArrowToStates("a","a3","r","r1")
+afn_e.addArrowToStates("a","a4","r1","r2")
+let initials = afn_e.states.filter(e=>e.isInitial)[0]
+console.log(afn_e.consume("",afn_e.clausura(initials)))*/
+//------------------------------------------
 var nodes = [];
 var edges = [];
 var network = null;
 
 var DFARadio = document.getElementById('DFA');
 var NFARadio = document.getElementById('NFA');
-var NFAERadio = document.getElementById('NFA-E');
+var NFAERadio = document.getElementById('NFAE');
 
 import {setStateTable, getNewDFAFromNFA} from "./Utils.js"
 
@@ -51,16 +71,22 @@ function draw() {
       deleteNode: function (data, callback){
         try{
           for(let a of data.edges){
-            if(DFARadio.checked)
+            if(DFARadio.checked){
               afd.removeEdgeFromArray(a)
-            else if(NFARadio.checked)
+            }else if(NFARadio.checked){
               afn.removeEdgeFromArray(a)
+            }else if(NFAERadio.checked){
+              afn_e.removeEdgeFromArray(a)
+            }
           }
           for(let a of data.nodes){
-            if(DFARadio.checked)
+            if(DFARadio.checked){
               afd.removeStateFromArray(a);
-            else if(NFARadio.checked)
+            }else if(NFARadio.checked){
               afn.removeStateFromArray(a);
+            }else if(NFAERadio.checked){
+              afn_e.removeStateFromArray(a)
+            }
           }
           callback(data);
         }catch(err){
@@ -93,16 +119,22 @@ function draw() {
       deleteEdge: function (data, callback){
         try{
           for(let a of data.edges){
-            if(DFARadio.checked)
+            if(DFARadio.checked){
               afd.removeEdgeFromArray(a)
-            else if(NFARadio.checked)
+            }else if(NFARadio.checked){
               afn.removeEdgeFromArray(a)
+            }else if(NFAERadio.checked){
+              afn_e.removeEdgeFromArray(a)
+            }
           }
           for(let a of data.nodes){
-            if(DFARadio.checked)
+            if(DFARadio.checked){
               afd.removeStateFromArray(a);
-            else if(NFARadio.checked)
+            }else if(NFARadio.checked){
               afn.removeStateFromArray(a);
+            }else if(NFAERadio.checked){
+              afn_e.removeStateFromArray(a)
+            }
           }
           //afd.removeEdgeFromArray(data.id)
           callback(data);
@@ -143,25 +175,38 @@ function saveNodeData(data, callback) {
     initial=true
   if(document.getElementById('isFinal').checked)
     final = true
-  if(initial)
-    data.color = 'lime'
-  if(final)
-    data.color = 'red'
-  if(initial && final)
+  if(initial && final){
     data.color = 'orange'
+  }else if(initial){
+    data.color = 'lime'
+  }else if(final){
+    data.color = 'red'
+  }else{
+    console.log("entro")
+    data.color = null
+  }
   try{
     if(!data.edit){
-      if(DFARadio.checked)
+      if(DFARadio.checked){
         afd.addState(data.label,data.id,initial,final);
-      else if(NFARadio.checked)
+      }else if(NFARadio.checked){
+        //console.log("NFA")
         afn.addState(data.label,data.id,initial,final);
+      }else if(NFAERadio.checked){
+        //console.log("nfae")
+        afn_e.addState(data.label,data.id,initial,final);
+      }
     }else {
-      if(DFARadio.checked)
+      if(DFARadio.checked){
         afd.editState(data.label,data.id,initial,final)
-      else if(NFARadio.checked)
+      }else if(NFARadio.checked){
         afn.editState(data.label,data.id,initial,final)
+      }else if(NFAERadio.checked){
+        afn_e.editState(data.label,data.id,initial,final);
+      }
     }
     clearNodePopUp();
+    console.log(data)
     callback(data);
   }catch(err){
     confirm(err.message)
@@ -202,15 +247,21 @@ function saveEdgeData(data, callback) {
         .toString(16)
         .substring(1);//`${data.from}-${data.label}-${data.to}`;
 
-      if(DFARadio.checked)
+      if(DFARadio.checked){
         afd.addArrowToStates(data.label, data.id,data.from, data.to)
-      else if(NFARadio.checked)
+      }else if(NFARadio.checked){
         afn.addArrowToStates(data.label, data.id,data.from, data.to)
+      }else if(NFAERadio.checked){
+        afn_e.addArrowToStates(data.label, data.id,data.from, data.to)
+      }
     }else{
-      if(DFARadio.checked)
+      if(DFARadio.checked){
         afd.editArrowName(data.label, data.id)
-      else if(NFARadio.checked)
+      }else if(NFARadio.checked){
         afn.editArrowName(data.label, data.id)
+      }else if(NFAERadio.checked){
+        afn_e.editArrowName(data.label, data.id)
+      }
     }
     clearEdgePopUp();
     callback(data);
@@ -223,6 +274,7 @@ function init() {
   try{
   afn = new AFN()
   afd = new AFD()
+  afn_e = new AFNE()
 }catch(err){
   confirm(err.message)
 }
@@ -238,10 +290,13 @@ button.addEventListener('click', () => {
 
 let input = document.getElementById('alphabet');
 input.addEventListener('input', function() {
-  if(DFARadio.checked)
+  if(DFARadio.checked){
     afd.setAlphabet(input.value)
-  else if(NFARadio.checked)
+  }else if(NFARadio.checked){
     afn.setAlphabet(input.value)
+  }else if(NFAERadio.checked){
+    afn_e.setAlphabet(input.value+",e")
+  }
 })
 
 
@@ -250,8 +305,12 @@ function handleClick() {
     let result = false;
     if(DFARadio.checked){
       result = afd.consume(document.getElementById('W').value);
-    }else if(NFARadio){
+    }else if(NFARadio.checked){
+      console.log("Entro nfa")
       result =afn.consume(document.getElementById('W').value, afn.getInitialState())
+    }else if(NFAERadio.checked){
+      console.log("Entro nfae")
+      result =afn_e.consume(document.getElementById('W').value,afn_e.clausura(afn_e.getInitialState()))
     }
     if(result){
       document.getElementById('message').style.color = "green";
