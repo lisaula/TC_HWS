@@ -30,6 +30,13 @@ export default class AFNE extends Automata{
     }
   }
 
+  arrowNameExistInAlphabet(name){
+    name.split("|").forEach(c => {
+      if(!this.alphabet.has(c) && c !="e")
+        throw new CharNotFoundError(c)
+    })
+    return true
+  }
   removeStateFromArray(id){
     const array = this.states.filter(e => e.name !==id)
     this.states = array;

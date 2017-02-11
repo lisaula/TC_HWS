@@ -11,26 +11,10 @@ const REGULAR = 2
 const BOTH = 3
 
 function setStateTable(afn){
-      //stateTable = new Array(afn.alphabet.size+1)
-      //for(let state of afn.states){
       let state = afn.states.filter(x=> x.isInitial)[0];
       newStates.push(state.name)
       statesInfo.push(state.isFinal? BOTH: INITIAL);
       finalStates = afn.states.filter(x=> x.isFinal);
-      //}
-      /*
-      for(let state of afn.states){
-        for(let a of afn.alphabet){
-          //console.log(`state ${state.name} with ${a} has ${getAllTransitionsStatesName(state,a)}`)
-          let newstate = getAllTransitionsStatesName(state,a)
-          if(newstate !=""){
-            if(!afn.stateNameExist(newstate)){
-
-              newStates.push(newstate)
-            }
-          }
-        }
-      }*/
       let i=0
       for(let s of newStates){
           stateTable.push(new Array(afn.alphabet.size))
@@ -38,19 +22,20 @@ function setStateTable(afn){
           for(let a of afn.alphabet){
             alphabet.push(a)
             let transitionsState = getAllTransitionsStates(afn,s,a);
-            console.log(`got ${transitionsState}`)
+
+            //console.log(`got ${transitionsState}`)
             if(transitionsState !=""){
               if(!stateNameExist(newStates,transitionsState)){
-                console.log(`not exist ${transitionsState}`)
+              //  console.log(`not exist ${transitionsState}`)
                 newStates.push(transitionsState);
                 let info = getStateInfo(transitionsState)
-                console.log(`info : ${info}`)
+                //console.log(`info : ${info}`)
                 statesInfo.push(info)
               }
             }else{
               transitionsState = "null"
             }
-            console.log(`seteado ..... ${transitionsState} ${i}-${x}`)
+            //console.log(`seteado ..... ${transitionsState} ${i}-${x}`)
             stateTable[i][x]=transitionsState
             x+=1
           }
@@ -69,6 +54,10 @@ function setStateTable(afn){
         }
         console.log(data)
       }
+}
+
+function setClosuredStateTable(afne){
+
 }
 
 function stateNameExist(array, name){
@@ -96,20 +85,20 @@ function getAllTransitionsStatesName(state, a){
 }
 
 function getAllTransitionsStates(afn,stateName, a){
-  console.log(stateName)
+  //console.log(stateName)
    let statesArray = stateName.split(",");
    let newStateName = ""
    for(let sName of statesArray){
      let state = afn.states.filter(x=>x.name ==sName)[0]
      for(let i=0; i<state.arrows.length;i++){
        let arrow = state.arrows[i]
-       console.log(`evaluating ${arrow.from.name}-${arrow.name}-${arrow.to.name} with ${a}`)
+       //console.log(`evaluating ${arrow.from.name}-${arrow.name}-${arrow.to.name} with ${a}`)
        arrow.name.split("|").filter(x=> {
          if(x==a){
            if(newStateName !=""){
              newStateName +=","
            }
-           console.log(`added ${arrow.to.name}`)
+           //console.log(`added ${arrow.to.name}`)
            newStateName += arrow.to.name
          }
        });
@@ -175,4 +164,4 @@ function getStateInfo(stateName){
   return REGULAR
 }
 
-export {setStateTable, getNewDFAFromNFA};
+export {setStateTable, getNewDFAFromNFA,stateNameExist, getStateInfo,getAllTransitionsStates, removeDuplicates};

@@ -2,27 +2,26 @@ import AFD from "./AFD.js"
 import expect from 'expect'
 import AFN from "./AFN.js"
 import AFNE from "./NFA-E.js"
+import {setEpsilonStateTable} from "./NFAEToDFA.js"
 let afn = undefined;
 let afd = undefined;
 //------------------------------------------
-let afn_e = undefined;
-/*afn_e.setAlphabet("a,e")
-afn_e.addState("p", "p",true,false)
-afn_e.addState("q", "q",false,false)
-afn_e.addState("r", "r",false,false)
+let afn_e = new AFNE();
+afn_e.setAlphabet("0,1")
+afn_e.addState("q0", "q0",true,false)
 afn_e.addState("q1", "q1",false,false)
-afn_e.addState("r1", "r1",false,false)
-afn_e.addState("r2", "r2",false,true)
+afn_e.addState("q2", "q2",false,false)
+afn_e.addState("q3", "q3",false,true)
 
-afn_e.addArrowToStates("e","e","p","q")
-afn_e.addArrowToStates("e","e(0)","p","r")
-afn_e.addArrowToStates("e","e(1)","r","r2")
-afn_e.addArrowToStates("a","a1","q","q1")
-afn_e.addArrowToStates("a","a2","q1","q")
-afn_e.addArrowToStates("a","a3","r","r1")
-afn_e.addArrowToStates("a","a4","r1","r2")
-let initials = afn_e.states.filter(e=>e.isInitial)[0]
-console.log(afn_e.consume("",afn_e.clausura(initials)))*/
+afn_e.addArrowToStates("1","1","q0","q1")
+afn_e.addArrowToStates("e","e","q1","q0")
+afn_e.addArrowToStates("0","0","q1","q2")
+afn_e.addArrowToStates("1","1(1)","q2","q3")
+afn_e.addArrowToStates("e","e(1)","q2","q3")
+setEpsilonStateTable(afn_e)
+//let initials = afn_e.states.filter(e=>e.isInitial)[0]
+//console.log(afn_e.consume("",afn_e.clausura(initials)))
+
 //------------------------------------------
 var nodes = [];
 var edges = [];

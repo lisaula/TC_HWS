@@ -30,7 +30,9 @@ export default class Automata{
       }
     })
   }
-
+  findState(name){
+    return this.states.filter(x=>x.name ==name)[0]
+  }
   removeByAttr(arr, attr, value){
     var i = arr.length;
     while(i--){
