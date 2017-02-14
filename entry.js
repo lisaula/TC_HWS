@@ -2,27 +2,11 @@ import AFD from "./AFD.js"
 import expect from 'expect'
 import AFN from "./AFN.js"
 import AFNE from "./NFA-E.js"
-import {setEpsilonStateTable} from "./NFAEToDFA.js"
+import {setEpsilonStateTable,getNewDFAFromNFAE} from "./NFAEToDFA.js"
+import {setStateTable, getNewDFAFromNFA} from "./Utils.js"
 let afn = undefined;
 let afd = undefined;
-//------------------------------------------
-let afn_e = new AFNE();
-afn_e.setAlphabet("0,1")
-afn_e.addState("q0", "q0",true,false)
-afn_e.addState("q1", "q1",false,false)
-afn_e.addState("q2", "q2",false,false)
-afn_e.addState("q3", "q3",false,true)
-
-afn_e.addArrowToStates("1","1","q0","q1")
-afn_e.addArrowToStates("e","e","q1","q0")
-afn_e.addArrowToStates("0","0","q1","q2")
-afn_e.addArrowToStates("1","1(1)","q2","q3")
-afn_e.addArrowToStates("e","e(1)","q2","q3")
-setEpsilonStateTable(afn_e)
-//let initials = afn_e.states.filter(e=>e.isInitial)[0]
-//console.log(afn_e.consume("",afn_e.clausura(initials)))
-
-//------------------------------------------
+let afn_e = undefined;
 var nodes = [];
 var edges = [];
 var network = null;
@@ -30,8 +14,6 @@ var network = null;
 var DFARadio = document.getElementById('DFA');
 var NFARadio = document.getElementById('NFA');
 var NFAERadio = document.getElementById('NFAE');
-
-import {setStateTable, getNewDFAFromNFA} from "./Utils.js"
 
 // randomly create some nodes and edges
 var data = {
@@ -294,7 +276,7 @@ input.addEventListener('input', function() {
   }else if(NFARadio.checked){
     afn.setAlphabet(input.value)
   }else if(NFAERadio.checked){
-    afn_e.setAlphabet(input.value+",e")
+    afn_e.setAlphabet(input.value)
   }
 })
 
@@ -350,5 +332,40 @@ function handleFromNFAToDFAButton(){
   }
   data = null
   data = newDataSet;
+  NFARadio.checked=false
+  DFARadio.checked=true
+  draw()
+}
+
+let execFromNFAEToDFAButton = document.getElementById('execFromNFAEToDFAButton');
+execFromNFAEToDFAButton.addEventListener('click', () => {
+    handleFromNFAEToDFAButton(); // (A)
+});
+function handleFromNFAEToDFAButton(){
+  setEpsilonStateTable(afn_e)
+  let newDataSet= getNewDFAFromNFAE()
+  console.log(newDataSet)
+  afd.setAlphabet(input.value)
+  for(let stateObj of newDataSet.nodes){
+    let initial = false, final = false
+    if(stateObj.color == 'lime' || stateObj.color == 'orange'){
+      initial=true
+    }
+    if(stateObj.color == 'red' || stateObj.color == 'orange'){
+      final = true
+    }
+    afd.addState(stateObj.label, stateObj.id,initial, final )
+  }
+
+  for(let edgesObj of newDataSet.edges){
+    let id = Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
+    afd.addArrowToStates(edgesObj.label,id,edgesObj.from,edgesObj.to)
+  }
+  data = null
+  data = newDataSet;
+  NFAERadio.checked = false
+  DFARadio.checked=true
   draw()
 }

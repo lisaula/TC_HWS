@@ -1,15 +1,17 @@
 import AFNE from "./NFA-E.js"
-import {getStateInfo,getAllTransitionsStates, stateNameExist,removeDuplicates} from "./Utils.js"
+import {getColorOfState,getAllTransitionsStates, stateNameExist,removeDuplicates} from "./Utils.js"
 
 var stateTable = []
 var newStates = []
 var finalStates = []
 var statesInfo=[]
+var alphabet =undefined
 const INITIAL = 0
 const FINAL = 1
 const REGULAR = 2
 const BOTH = 3
 function setEpsilonStateTable(afne){
+  alphabet = Array.from(afne.alphabet)
   finalStates = afne.states.filter(x=> x.isFinal);
   let state = afne.getInitialState()
   let clousuredStates = afne.clausura(state)
@@ -60,5 +62,34 @@ function setEpsilonStateTable(afne){
     console.log(data)
   }
 }
+function getStateInfo(stateName){
+  for(let fS of finalStates){
+    for(let a of stateName.split(",")){
+      if(fS.name == a){
+        return FINAL
+      }
+    }
+  }
+  return REGULAR
+}
+function getNewDFAFromNFAE(){
+  var nodes = []
+  var edges = []
+  for(let i=0; i<stateTable.length; i++){
+    if(statesInfo[i]!=REGULAR)
+      nodes.push({id:newStates[i], label:newStates[i], color:getColorOfState(statesInfo[i])})
+    else
+      nodes.push({id:newStates[i], label:newStates[i]})
+    for(let x=0; x<stateTable[i].length;x++){
+      if(stateTable[i][x] != 'null')
+        edges.push({from:newStates[i], to:stateTable[i][x], label: alphabet[x]})
+    }
+  }
+  var dataSet = {
+    nodes: nodes,
+    edges: edges
+  }
+  return dataSet;
+}
 
-export {setEpsilonStateTable};
+export {setEpsilonStateTable, getNewDFAFromNFAE};

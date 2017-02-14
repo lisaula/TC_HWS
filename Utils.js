@@ -56,10 +56,6 @@ function setStateTable(afn){
       }
 }
 
-function setClosuredStateTable(afne){
-
-}
-
 function stateNameExist(array, name){
   for(let s of array){
     if(s === name)
@@ -132,7 +128,8 @@ function getNewDFAFromNFA(){
     else
       nodes.push({id:newStates[i], label:newStates[i]})
     for(let x=0; x<stateTable[i].length;x++){
-      edges.push({from:newStates[i], to:stateTable[i][x], label: alphabet[x]})
+      if(stateTable[i][x] != 'null')
+        edges.push({from:newStates[i], to:stateTable[i][x], label: alphabet[x]})
     }
   }
   var dataSet = {
@@ -164,4 +161,4 @@ function getStateInfo(stateName){
   return REGULAR
 }
 
-export {setStateTable, getNewDFAFromNFA,stateNameExist, getStateInfo,getAllTransitionsStates, removeDuplicates};
+export {setStateTable, getColorOfState,getNewDFAFromNFA,stateNameExist,getAllTransitionsStates, removeDuplicates};

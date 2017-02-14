@@ -28,13 +28,13 @@ export default class AFD extends Automata{
 
     const fromState = this.states.filter(e => e.id == fromStateId)[0]
     const toState = this.states.filter(e => e.id == toStateId)[0]
-    //console.log(`adding ${name} from ${fromStateName} to ${toStateName}`)
+    console.log(`adding ${name} from ${fromStateId} to ${toStateId}`)
 
     if(!fromState)
-      throw new StateNotFoundError(fromStateName)
+      throw new StateNotFoundError(fromStateId)
 
     if(!toState)
-      throw new StateNotFoundError(toStateName)
+      throw new StateNotFoundError(toStateId)
 
     if(this.arrowNameExistInAlphabet(name)){
         if(this.arrowExistInState(fromState, name)){
