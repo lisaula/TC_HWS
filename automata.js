@@ -3,7 +3,10 @@ export default class Automata{
   states = []
   edges=[]
   alphabet = undefined
-  constructor(){}
+
+  constructor(alphabet){
+    this.alphabet = alphabet;
+  }
 
   setAlphabet(alphabet){
     this.alphabet = null;
@@ -68,6 +71,18 @@ export default class Automata{
     })
     return true
   }
+
+  toData(){
+		let nodes = []
+		let edges = []
+		this.states.map(x => {
+			nodes.push({isInitial: x.isInitial, isFinal: x.isFinal, label: x.name})
+			x.arrows.map(t => {
+				edges.push({from: t.from.name, to: t.to.name, label: t.name})
+			})
+		})
+		return {nodes: nodes, edges: edges}
+	}
 }
 
 export class State {

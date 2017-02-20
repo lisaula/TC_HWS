@@ -4,6 +4,7 @@ import AFN from "./AFN.js"
 import AFNE from "./NFA-E.js"
 import {setEpsilonStateTable,getNewDFAFromNFAE} from "./NFAEToDFA.js"
 import {setStateTable, getNewDFAFromNFA} from "./Utils.js"
+import {getRegexFrom} from "./DFAToRegEx.js"
 let afn = undefined;
 let afd = undefined;
 let afn_e = undefined;
@@ -256,6 +257,7 @@ function init() {
   afn = new AFN()
   afd = new AFD()
   afn_e = new AFNE()
+  evaluateButtonApperance();
 }catch(err){
   confirm(err.message)
 }
@@ -305,6 +307,42 @@ function handleClick() {
   //}
 }
 
+function evaluateButtonApperance(){
+  if(DFARadio.checked){
+    document.getElementById('execFromNFAToDFAButton').style.display="none";
+    document.getElementById('execFromNFAEToDFAButton').style.display="none";
+    document.getElementById('fromDFAToRegexButton').style.display="block";
+  }else if(NFARadio.checked){
+    document.getElementById('execFromNFAToDFAButton').style.display="block";
+    document.getElementById('fromDFAToRegexButton').style.display="block";
+    document.getElementById('execFromNFAEToDFAButton').style.display="none";
+  }else if(NFAERadio.checked){
+    document.getElementById('execFromNFAToDFAButton').style.display="none";
+    document.getElementById('fromDFAToRegexButton').style.display="none";
+    document.getElementById('execFromNFAEToDFAButton').style.display="block";
+  }
+}
+let radios = document.getElementsByName('automata');
+radios.forEach(x => (
+  x.onclick = function(){
+    afn = new AFN()
+    afd = new AFD()
+    afn_e = new AFNE()
+    data={
+      nodes:[],
+      edges:[]
+    }
+      draw();
+      evaluateButtonApperance();
+  }
+))
+
+let fromDFAToRegexButton = document.getElementById('fromDFAToRegexButton');
+fromDFAToRegexButton.addEventListener('click', ()=>{
+  let regex = getRegexFrom(DFARadio.checked?afd: afn);
+  document.getElementById('message').style.color = "green";
+  document.getElementById('message').innerHTML = `${regex}`
+})
 let execFromNFAToDFAButton = document.getElementById('execFromNFAToDFAButton');
 execFromNFAToDFAButton.addEventListener('click', () => {
     handleFromNFAToDFAButton(); // (A)
@@ -335,6 +373,7 @@ function handleFromNFAToDFAButton(){
   NFARadio.checked=false
   DFARadio.checked=true
   draw()
+  evaluateButtonApperance();
 }
 
 let execFromNFAEToDFAButton = document.getElementById('execFromNFAEToDFAButton');

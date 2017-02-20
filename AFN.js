@@ -1,5 +1,6 @@
 import Automata, {State, Arrow} from "./automata.js"
 import {StateAlreadyExistError} from "./errors.js"
+import DFAre from "./DFA-re.js"
 export default class AFN extends Automata{
   constructor(){
     super()
@@ -28,6 +29,16 @@ export default class AFN extends Automata{
       this.edges.push(arrow)
     }
   }
+  generateDFA(state){
+		let dfa = new DFAre(this.alphabet)
+		this.states.forEach(s => {
+			dfa.addState(s.name,s.id, s.isInitial,s.name == state.name)
+		})
+		this.states.forEach(s => {
+			s.arrows.forEach(t => dfa.addArrowToStates(t.name,t.id,t.from.name,t.to.name))
+		})
+		return dfa
+	}
 
   removeStateFromArray(id){
     const array = this.states.filter(e => e.name !==id)
