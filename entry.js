@@ -5,6 +5,7 @@ import AFNE from "./NFA-E.js"
 import {setEpsilonStateTable,getNewDFAFromNFAE} from "./NFAEToDFA.js"
 import {setStateTable, getNewDFAFromNFA} from "./Utils.js"
 import {getRegexFrom} from "./DFAToRegEx.js"
+import {regexToNFAe} from "./RegExToNFAE.js"
 let afn = undefined;
 let afd = undefined;
 let afn_e = undefined;
@@ -15,7 +16,9 @@ var network = null;
 var DFARadio = document.getElementById('DFA');
 var NFARadio = document.getElementById('NFA');
 var NFAERadio = document.getElementById('NFAE');
-
+var regexRadio = document.getElementById('regexRadio')
+//---------------------
+//---------------------
 // randomly create some nodes and edges
 var data = {
   nodes: [],
@@ -312,14 +315,22 @@ function evaluateButtonApperance(){
     document.getElementById('execFromNFAToDFAButton').style.display="none";
     document.getElementById('execFromNFAEToDFAButton').style.display="none";
     document.getElementById('fromDFAToRegexButton').style.display="block";
+    document.getElementById('regExToNFAEButton').style.display="none";
   }else if(NFARadio.checked){
     document.getElementById('execFromNFAToDFAButton').style.display="block";
     document.getElementById('fromDFAToRegexButton').style.display="block";
     document.getElementById('execFromNFAEToDFAButton').style.display="none";
+    document.getElementById('regExToNFAEButton').style.display="none";
   }else if(NFAERadio.checked){
     document.getElementById('execFromNFAToDFAButton').style.display="none";
     document.getElementById('fromDFAToRegexButton').style.display="none";
     document.getElementById('execFromNFAEToDFAButton').style.display="block";
+    document.getElementById('regExToNFAEButton').style.display="none";
+  }else if(regexRadio.checked){
+    document.getElementById('execFromNFAToDFAButton').style.display="none";
+    document.getElementById('fromDFAToRegexButton').style.display="none";
+    document.getElementById('execFromNFAEToDFAButton').style.display="none";
+    document.getElementById('regExToNFAEButton').style.display="block";
   }
 }
 let radios = document.getElementsByName('automata');
@@ -406,5 +417,42 @@ function handleFromNFAEToDFAButton(){
   data = newDataSet;
   NFAERadio.checked = false
   DFARadio.checked=true
+  evaluateButtonApperance();
   draw()
 }
+function getColor(initial, final){
+  if(initial && final){
+    return 'orange'
+  }else if(initial){
+    return 'lime'
+  }else if(final){
+    return 'red'
+  }else{
+    return null
+  }
+}
+let regExToNFAEButton = document.getElementById('regExToNFAEButton');
+regExToNFAEButton.addEventListener('click', ()=> {
+  let regexInput = document.getElementById('regex');
+  afn_e = regexToNFAe(regexInput.value);
+  var nodes = []
+  var edges = []
+  for(let state of afn_e.states ){
+    console.log(state)
+    nodes.push({id:state.id, label:state.name, color: getColor(state.isInitial, state.isFinal)})
+  }
+  for(let e of afn_e.edges){
+    edges.push({from:e.from.id, to:e.to.id,label:e.name, id:e.id })
+  }
+  data = null;
+  data = {
+    nodes: nodes,
+    edges: edges
+  }
+  NFAERadio.checked = true
+  DFARadio.checked=false
+  NFARadio.checked=false
+  evaluateButtonApperance();
+  input.value = Array.from(afn_e.alphabet).join(",");
+  draw()
+})

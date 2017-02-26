@@ -76,13 +76,15 @@ function getNewDFAFromNFAE(){
   var nodes = []
   var edges = []
   for(let i=0; i<stateTable.length; i++){
-    if(statesInfo[i]!=REGULAR)
-      nodes.push({id:newStates[i], label:newStates[i], color:getColorOfState(statesInfo[i])})
-    else
-      nodes.push({id:newStates[i], label:newStates[i]})
-    for(let x=0; x<stateTable[i].length;x++){
-      if(stateTable[i][x] != 'null')
-        edges.push({from:newStates[i], to:stateTable[i][x], label: alphabet[x]})
+    if(newStates[i]!=undefined){
+      if(statesInfo[i]!=REGULAR)
+        nodes.push({id:newStates[i], label:newStates[i], color:getColorOfState(statesInfo[i])})
+      else
+        nodes.push({id:newStates[i], label:newStates[i]})
+      for(let x=0; x<stateTable[i].length;x++){
+        if(stateTable[i][x] != 'null')
+          edges.push({from:newStates[i], to:stateTable[i][x], label: alphabet[x]})
+      }
     }
   }
   var dataSet = {

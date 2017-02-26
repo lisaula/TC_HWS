@@ -1,15 +1,16 @@
 import Automata, {State, Arrow} from "./automata.js"
-import {StateAlreadyExistError} from "./errors.js"
+import {StateAlreadyExistError,StateNotFoundError} from "./errors.js"
 
 export default class AFNE extends Automata{
-  constructor(){
-    super()
+  constructor(alphabet){
+    super(alphabet)
   }
 
   addState(stateName, stateId, isInitial = false, isFinal = false){
     if(this.stateExist(stateName, stateId)){
       throw new StateAlreadyExistError(stateName)
     }
+    console.log(`added state ${stateName}`)
     this.states.push(new State(stateName, stateId, isInitial, isFinal));
   }
 
@@ -18,10 +19,10 @@ export default class AFNE extends Automata{
     const toState = this.states.filter(e => e.id == toStateId)[0]
 
     if(!fromState)
-      throw new StateNotFoundError(fromStateName)
+      throw new StateNotFoundError(fromStateId)
 
     if(!toState)
-      throw new StateNotFoundError(toStateName)
+      throw new StateNotFoundError(toStateId)
 
     if(this.arrowNameExistInAlphabet(name)){
       const arrow = new Arrow(name, id, fromState, toState)

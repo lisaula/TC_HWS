@@ -42,15 +42,20 @@
   }
   #alphabet{
     margin-top: : 3%;
-    margin-bottom: 3%;
+    margin-bottom: 1%;
     width: 250px;
   }
   #W{
-    margin-left: 2.48%;
+		margin-left: 2.48%;
     margin-top: : 3%;
-    margin-bottom: 3%;
+    margin-bottom: 1%;
     width: 250px;
   }
+	#regex{
+    margin-top: : 3%;
+    margin-bottom: 0.5%;
+    width: 350px;
+	}
   #node-popUp {
     display:none;
     position:absolute;
@@ -81,7 +86,7 @@
     padding:10px;
     text-align: center;
   }
-  #execButton,#execFromNFAToDFAButton,#fromDFAToRegexButton,#execFromNFAEToDFAButton {
+  #execButton,#regExToNFAEButton,#execFromNFAToDFAButton,#fromDFAToRegexButton,#execFromNFAEToDFAButton {
     background-color: #4CAF50; /* Green */
     margin-top: 10px;
     margin-bottom: 15px;
@@ -101,18 +106,23 @@
 		</style>
 	</head>
 	<body id="body">
-    <h2>AFN</h2>
-    Alphabet: <input type="text" id="alphabet" placeholder="0,1"><br>
-    W: <input type="text" id="W" placeholder="011001"><br>
+    <h2>Teo de Compu HW</h2>
+		<div id="inputs">
+	    Alphabet: <input type="text" id="alphabet" placeholder="0,1"><br>
+	    W: <input type="text" id="W" placeholder="011001"><br>
+			<input type="text" id="regex" placeholder="Regualar Expression"><br>
+		</div>
 		<form>
 	 		<input type="radio" name="automata" id="DFA" value="DFA" checked> DFA<br>
 	 		<input type="radio" name="automata" id="NFA"value="NFA"> NFA<br>
 	 		<input type="radio" name="automata" id="NFAE"value="NFAE"> NFA-E<br>
+			<input type="radio" name="automata" id="regexRadio"value="Regular Expression">Regular Expression<br>
 		</form>
     <input type="button" id="execButton" value="Exec">
 		<input type="button" id="fromDFAToRegexButton" value="TO Regular Expression">
 		<input type="button" id="execFromNFAToDFAButton" value="From NFA to DFA">
 		<input type="button" id="execFromNFAEToDFAButton" value="From E-NFA to DFA">
+		<input type="button" id="regExToNFAEButton" value="From RegEx to E-NFA">
 		<div id="message"></div>
     <div id="node-popUp">
       <span id="node-operation">node</span> <br>
