@@ -71,6 +71,21 @@
     padding:10px;
     text-align: center;
   }
+	#Automata-PopUp{
+		display:none;
+    position:absolute;
+    top:350px;
+    left:170px;
+    z-index:299;
+    width:250px;
+    height:150px;
+    background-color: #f9f9f9;
+    border-style:solid;
+    border-width:3px;
+    border-color: #5394ed;
+    padding:10px;
+    text-align: center;
+	}
   #edge-popUp {
     display:none;
     position:absolute;
@@ -86,7 +101,7 @@
     padding:10px;
     text-align: center;
   }
-  #execButton,#regExToNFAEButton,#execFromNFAToDFAButton,#fromDFAToRegexButton,#execFromNFAEToDFAButton {
+  #execButton,#saveButton,#regExToNFAEButton,#execFromNFAToDFAButton,#fromDFAToRegexButton,#execFromNFAEToDFAButton {
     background-color: #4CAF50; /* Green */
     margin-top: 10px;
     margin-bottom: 15px;
@@ -117,8 +132,10 @@
 	 		<input type="radio" name="automata" id="NFA"value="NFA"> NFA<br>
 	 		<input type="radio" name="automata" id="NFAE"value="NFAE"> NFA-E<br>
 			<input type="radio" name="automata" id="regexRadio"value="Regular Expression">Regular Expression<br>
+			<input type="radio" name="automata" id="operaciones"value="Operaciones con Automatas"> Operaciones con automatas<br>
 		</form>
     <input type="button" id="execButton" value="Exec">
+		<input type="button" id="saveButton" value="Save">
 		<input type="button" id="fromDFAToRegexButton" value="TO Regular Expression">
 		<input type="button" id="execFromNFAToDFAButton" value="From NFA to DFA">
 		<input type="button" id="execFromNFAEToDFAButton" value="From E-NFA to DFA">
@@ -140,6 +157,24 @@
       </table>
       <input type="button" value="save" id="node-saveButton" />
       <input type="button" value="cancel" id="node-cancelButton" />
+    </div>
+
+		<div id="Automata-PopUp">
+      <span id="automata-operation">Automata</span> <br>
+			<table style="margin:auto;">
+
+        <tr>
+          <td>First:</td><td><select id="first-select"/></td><td><input type="button" value="View" id="view-Button1"/></td>
+        </tr>
+        <tr>
+          <td>Second:</td><td> <select id="second-select"/></td><td><input type="button" value="View" id="view-Button2"/></td>
+        </tr>
+      </table>
+      <input type="button" value="Union" id="union-Button" />
+			<input type="button" value="Interseccion" id="interseccion-Button" />
+			<input type="button" value="Diferencia" id="direfencia-Button" />
+      <input type="button" value="complemento" id="complemento-Button" />
+			<input type="button" value="cancel" id="automata-cancelButton" />
     </div>
 
     <div id="edge-popUp">

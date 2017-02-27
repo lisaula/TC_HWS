@@ -72,6 +72,30 @@ export default class Automata{
     return true
   }
 
+  toDataSet(){
+		let nodes = []
+		let edges = []
+		this.states.map(state => {
+			nodes.push({id:state.id, label:state.name, color: this.getColor(state.isInitial, state.isFinal)})
+			state.arrows.map(e => {
+				edges.push({from:e.from.id, to:e.to.id,label:e.name, id:e.id })
+			})
+		})
+		return {nodes: nodes, edges: edges}
+	}
+
+  getColor(initial, final){
+    if(initial && final){
+      return 'orange'
+    }else if(initial){
+      return 'lime'
+    }else if(final){
+      return 'red'
+    }else{
+      return null
+    }
+  }
+
   toData(){
 		let nodes = []
 		let edges = []
@@ -92,6 +116,17 @@ export class State {
     this.name = name
     this.isInitial = isInitial
     this.isFinal = isFinal
+  }
+  hasTransition(a){
+    return this.arrows.filter(x=> x.validate(a)).length>0
+  }
+  setLabels(label1,label2){
+    this.label1 = label1;
+    this.label2 = label2;
+    console.log(`label1 ${this.label1} label2 ${this.label2}`);
+  }
+  setFinal(){
+    this.isFinal = true
   }
   setValues(name,isInitial, isFinal){
     this.name = name

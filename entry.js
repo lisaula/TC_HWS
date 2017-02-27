@@ -6,6 +6,8 @@ import {setEpsilonStateTable,getNewDFAFromNFAE} from "./NFAEToDFA.js"
 import {setStateTable, getNewDFAFromNFA} from "./Utils.js"
 import {getRegexFrom} from "./DFAToRegEx.js"
 import {regexToNFAe} from "./RegExToNFAE.js"
+import {getDFAs} from "./examplesAutomatons.js"
+import {unionAutomaton, intersectionAutomaton, differenceAutomaton, complementAutomaton} from "./AutomataOperations.js"
 let afn = undefined;
 let afd = undefined;
 let afn_e = undefined;
@@ -17,7 +19,39 @@ var DFARadio = document.getElementById('DFA');
 var NFARadio = document.getElementById('NFA');
 var NFAERadio = document.getElementById('NFAE');
 var regexRadio = document.getElementById('regexRadio')
+var operacionesRadio = document.getElementById('operaciones');
 //---------------------
+/*var div = document.querySelector("#Automata-PopUp"),
+frag = document.createDocumentFragment(),
+select = document.createElement("select");
+
+select.options.add( new Option("Method1","AU", true, true) );
+select.options.add( new Option("Method2","FI") );
+
+
+frag.appendChild(select);
+div.appendChild(frag);
+*/
+let listOfExamples = getDFAs();
+var select = document.getElementById('first-select');
+var select2 = document.getElementById('second-select');
+function populateSelects(){
+  var dataSelect = [];
+  for(let i=0; i< listOfExamples.length; i++){
+    dataSelect.push({text: `Ejemplo ${i}`, value:i })
+  }
+  select.options.length = 0; // clear out existing items
+  for(var i=0; i < dataSelect.length; i++) {
+      var d = dataSelect[i];
+      select.options.add(new Option(d.text, i))
+  }
+
+  select2.options.length = 0; // clear out existing items
+  for(var i=0; i < dataSelect.length; i++) {
+      var d = dataSelect[i];
+      select2.options.add(new Option(d.text, i))
+  }
+}
 //---------------------
 // randomly create some nodes and edges
 var data = {
@@ -153,6 +187,8 @@ function cancelNodeEdit(callback) {
   callback(null);
 }
 
+
+
 function saveNodeData(data, callback) {
   data.label = document.getElementById('node-label').value;
   let initial=false, final=false;
@@ -217,6 +253,8 @@ function cancelEdgeEdit(callback) {
   callback(null);
 }
 
+
+
 function saveEdgeData(data, callback) {
   if (typeof data.to === 'object'){
     data.to = data.to.id
@@ -261,6 +299,7 @@ function init() {
   afd = new AFD()
   afn_e = new AFNE()
   evaluateButtonApperance();
+  populateSelects();
 }catch(err){
   confirm(err.message)
 }
@@ -311,26 +350,25 @@ function handleClick() {
 }
 
 function evaluateButtonApperance(){
+  document.getElementById('saveButton').style.display="none";
+  document.getElementById('execFromNFAToDFAButton').style.display="none";
+  document.getElementById('execFromNFAEToDFAButton').style.display="none";
+  document.getElementById('fromDFAToRegexButton').style.display="none";
+  document.getElementById('saveButton').style.display="none";
+  document.getElementById('regExToNFAEButton').style.display="none";
   if(DFARadio.checked){
-    document.getElementById('execFromNFAToDFAButton').style.display="none";
-    document.getElementById('execFromNFAEToDFAButton').style.display="none";
     document.getElementById('fromDFAToRegexButton').style.display="block";
-    document.getElementById('regExToNFAEButton').style.display="none";
+    document.getElementById('saveButton').style.display="block";
   }else if(NFARadio.checked){
     document.getElementById('execFromNFAToDFAButton').style.display="block";
     document.getElementById('fromDFAToRegexButton').style.display="block";
-    document.getElementById('execFromNFAEToDFAButton').style.display="none";
-    document.getElementById('regExToNFAEButton').style.display="none";
   }else if(NFAERadio.checked){
-    document.getElementById('execFromNFAToDFAButton').style.display="none";
-    document.getElementById('fromDFAToRegexButton').style.display="none";
     document.getElementById('execFromNFAEToDFAButton').style.display="block";
-    document.getElementById('regExToNFAEButton').style.display="none";
   }else if(regexRadio.checked){
-    document.getElementById('execFromNFAToDFAButton').style.display="none";
-    document.getElementById('fromDFAToRegexButton').style.display="none";
-    document.getElementById('execFromNFAEToDFAButton').style.display="none";
     document.getElementById('regExToNFAEButton').style.display="block";
+  }else if(operacionesRadio.checked){
+    document.getElementById('Automata-PopUp').style.display= 'block';
+    populateSelects();
   }
 }
 let radios = document.getElementsByName('automata');
@@ -456,3 +494,113 @@ regExToNFAEButton.addEventListener('click', ()=> {
   input.value = Array.from(afn_e.alphabet).join(",");
   draw()
 })
+
+document.getElementById('view-Button1').addEventListener('click', () => {
+  var value = select.options[select.selectedIndex].value;
+  let automata = listOfExamples[value]
+  data = null;
+  data = automata.toDataSet();
+  NFAERadio.checked = false
+  DFARadio.checked=true
+  NFARadio.checked=false
+  evaluateButtonApperance()
+  input.value = Array.from(automata.alphabet).join(",");
+  afd=automata;
+  draw()
+});
+
+
+document.getElementById('view-Button2').addEventListener('click', () => {
+  var value = select2.options[select2.selectedIndex].value;
+  let automata = listOfExamples[value]
+  data = null;
+  data = automata.toDataSet();
+  NFAERadio.checked = false
+  DFARadio.checked=true
+  NFARadio.checked=false
+  evaluateButtonApperance()
+  afd=automata;
+  input.value = Array.from(automata.alphabet).join(",");
+  draw()
+});
+
+document.getElementById('union-Button').addEventListener('click', () =>{
+  let value1 = select.options[select.selectedIndex].value
+  let value2 = select2.options[select2.selectedIndex].value
+  let automata1 = listOfExamples[value1]
+  let automata2 = listOfExamples[value2]
+
+  let newAutomata=unionAutomaton(automata1,automata2)
+  data = null;
+  data = newAutomata.toDataSet();
+  NFAERadio.checked = false
+  DFARadio.checked=true
+  NFARadio.checked=false
+  evaluateButtonApperance()
+  afd=newAutomata;
+  input.value = Array.from(newAutomata.alphabet).join(",");
+  draw()
+  //console.log(newAutomata);
+});
+
+document.getElementById('interseccion-Button').addEventListener('click', () =>{
+  let value1 = select.options[select.selectedIndex].value
+  let value2 = select2.options[select2.selectedIndex].value
+  let automata1 = listOfExamples[value1]
+  let automata2 = listOfExamples[value2]
+
+  let newAutomata=intersectionAutomaton(automata1,automata2)
+  data = null;
+  data = newAutomata.toDataSet();
+  NFAERadio.checked = false
+  DFARadio.checked=true
+  NFARadio.checked=false
+  evaluateButtonApperance()
+  input.value = Array.from(newAutomata.alphabet).join(",");
+  afd=newAutomata;
+  draw()
+  //console.log(newAutomata);
+});
+
+document.getElementById('direfencia-Button').addEventListener('click', () =>{
+  let value1 = select.options[select.selectedIndex].value
+  let value2 = select2.options[select2.selectedIndex].value
+  let automata1 = listOfExamples[value1]
+  let automata2 = listOfExamples[value2]
+
+  let newAutomata=differenceAutomaton(automata1,automata2)
+  data = null;
+  data = newAutomata.toDataSet();
+  NFAERadio.checked = false
+  DFARadio.checked=true
+  NFARadio.checked=false
+  evaluateButtonApperance()
+  input.value = Array.from(newAutomata.alphabet).join(",");
+  afd=newAutomata;
+  draw()
+  //console.log(newAutomata);
+});
+
+document.getElementById('complemento-Button').addEventListener('click', () =>{
+  let value1 = select.options[select.selectedIndex].value
+  let automata1 = listOfExamples[value1]
+
+  let newAutomata=complementAutomaton(automata1)
+  data = null;
+  data = newAutomata.toDataSet();
+  NFAERadio.checked = false
+  DFARadio.checked=true
+  NFARadio.checked=false
+  evaluateButtonApperance()
+  input.value = Array.from(newAutomata.alphabet).join(",");
+  afd=newAutomata;
+  draw()
+  //console.log(newAutomata);
+});
+
+document.getElementById('automata-cancelButton').addEventListener('click', () =>{
+  document.getElementById('Automata-PopUp').style.display= 'none';
+});
+document.getElementById('saveButton').addEventListener('click', () => {
+  listOfExamples.push(afd)
+});

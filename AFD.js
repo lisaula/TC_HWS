@@ -6,13 +6,18 @@ export default class AFD extends Automata{
     super(alphabet)
   }
 
-  addState(stateName,stateId, isInitial = false, isFinal =false){
+  addState(stateName,stateId, isInitial = false, isFinal =false, label1=undefined, label2=undefined){
     console.log(`${stateName} ${stateId} ${isInitial} ${isFinal}`)
     if(!this.stateExist(stateName, stateId)){
-      this.states.push(new State(stateName, stateId,isInitial, isFinal))
+      let newstate = new State(stateName, stateId,isInitial, isFinal)
+      newstate.setLabels(label1, label2);
+      this.states.push(newstate)
     }else{
       throw new StateAlreadyExistError(stateName)
     }
+  }
+  getInitialState(){
+    return this.states.filter(e => e.isInitial)[0];
   }
 
   editState(stateName,stateId, isInitial = false, isFinal =false){
