@@ -101,7 +101,7 @@
     padding:10px;
     text-align: center;
   }
-  #execButton,#saveButton,#regExToNFAEButton,#execFromNFAToDFAButton,#fromDFAToRegexButton,#execFromNFAEToDFAButton {
+  #execButton,#saveButton,#minimizarButton,#regExToNFAEButton,#execFromNFAToDFAButton,#fromDFAToRegexButton,#execFromNFAEToDFAButton {
     background-color: #4CAF50; /* Green */
     margin-top: 10px;
     margin-bottom: 15px;
@@ -133,9 +133,11 @@
 	 		<input type="radio" name="automata" id="NFAE"value="NFAE"> NFA-E<br>
 			<input type="radio" name="automata" id="regexRadio"value="Regular Expression">Regular Expression<br>
 			<input type="radio" name="automata" id="operaciones"value="Operaciones con Automatas"> Operaciones con automatas<br>
+			<input type="radio" name="automata" id="pdaRadio" value="PDA"> PDA<br>
 		</form>
     <input type="button" id="execButton" value="Exec">
 		<input type="button" id="saveButton" value="Save">
+		<input type="button" id="minimizarButton" value="Minimizar">
 		<input type="button" id="fromDFAToRegexButton" value="TO Regular Expression">
 		<input type="button" id="execFromNFAToDFAButton" value="From NFA to DFA">
 		<input type="button" id="execFromNFAEToDFAButton" value="From E-NFA to DFA">

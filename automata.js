@@ -15,6 +15,9 @@ export default class Automata{
         this.alphabet.add(a)
     }
   }
+  findState(stateName) {
+		return this.states.find(e => e.name == stateName)
+	}
 
   setInitialState(stateName){
     this.states = this.states.map(n => {
@@ -117,6 +120,9 @@ export class State {
     this.isInitial = isInitial
     this.isFinal = isFinal
   }
+  touched(){
+    this.touch = true;
+  }
   hasTransition(a){
     return this.arrows.filter(x=> x.validate(a)).length>0
   }
@@ -169,8 +175,63 @@ export class Arrow{
     return false;
   }
 
+  validatePDA(a, top){
+    let labelInfo = this.getLabelInfo(this.name)
+    for(let n of labelInfo[0].split("|")){
+      //console.log("evaluando a "+a+" top "+top+" li[1]"+labelInfo[1]);
+      if(n == a){
+        return true
+      }else if(n=="e" && (top =="z0" || labelInfo[1]==top)){
+        return true
+      }
+    }
+    return false
+  }
+
+  getLabelInfo(name){
+    let array = name.split(",")
+    let returnArray =[]
+    if(array.length>0){
+      returnArray.push(array[0].trim())
+      let array2 = array[1].split("/")
+      if(array2.length>0){
+        returnArray.push(array2[0].trim())
+        returnArray.push(array2[1].trim())
+      }
+    }
+    return returnArray;
+  }
+
   validateEpsilon(){
     for(let n of this.name.split("|")){
+      if(n =="e")
+        return true;
+    }
+    return false;
+  }
+
+  match(a) {
+		let setOfa = a.split(/,|\//)
+		for(let e of this.name.split(/,|\//))
+		{
+			for(let c of setOfa)
+			{
+				if (c == e) return true
+			}
+		}
+		return false
+	}
+
+	ableToPop(symbol,popvalue){
+		let values = this.name.split('/')
+		let leftValue = values[0].split(',')
+		let rightValue = values[1].split(',')
+		return leftValue[0] ==  symbol && leftValue[1] == popvalue
+	}
+
+  validateEpsilonPDA(){
+    let labelInfo = this.getLabelInfo(this.name)
+    for(let n of labelInfo[0].split("|")){
       if(n =="e")
         return true;
     }

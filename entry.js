@@ -8,6 +8,8 @@ import {getRegexFrom} from "./DFAToRegEx.js"
 import {regexToNFAe} from "./RegExToNFAE.js"
 import {getDFAs} from "./examplesAutomatons.js"
 import {unionAutomaton, intersectionAutomaton, differenceAutomaton, complementAutomaton} from "./AutomataOperations.js"
+import {setReducedTable, getAutomata} from "./minimize.js"
+import Stack from "./stack.js"
 let afn = undefined;
 let afd = undefined;
 let afn_e = undefined;
@@ -20,18 +22,57 @@ var NFARadio = document.getElementById('NFA');
 var NFAERadio = document.getElementById('NFAE');
 var regexRadio = document.getElementById('regexRadio')
 var operacionesRadio = document.getElementById('operaciones');
+var pdaRadio = document.getElementById('pdaRadio');
 //---------------------
-/*var div = document.querySelector("#Automata-PopUp"),
-frag = document.createDocumentFragment(),
-select = document.createElement("select");
+//console.log(setReducedTable(afd));
+import PDA from "./PDA.js"
 
-select.options.add( new Option("Method1","AU", true, true) );
-select.options.add( new Option("Method2","FI") );
+let pda =undefined;// new PDA()
+// const palindromoPar = new PDA()
+// palindromoPar.setAlphabet("0,1")
+// palindromoPar.addState('q0','q0',true)
+// palindromoPar.addState('q1',"q1")
+// palindromoPar.addState('q2',"q2")
+// palindromoPar.addState('q3',"q3",false,true)
+//
+// palindromoPar.addArrowToStates('0,Z0/0,Z0','0,Z0/0,Z0','q0','q0')
+// palindromoPar.addArrowToStates('0,0/0,0','0,0/0,0','q0','q0')
+// palindromoPar.addArrowToStates('1,0/1,0','1,0/1,0','q0','q0')
+// palindromoPar.addArrowToStates('1,1/1,1','1,1/1,1','q0','q0')
+// palindromoPar.addArrowToStates('1,Z0/Z0','1,Z0/Z0','q0','q0')
+// palindromoPar.addArrowToStates('0,1/0,1','0,1/0,1','q0','q0')
+//
+// palindromoPar.addArrowToStates('0,0/e','0,0/e','q1','q1')
+// palindromoPar.addArrowToStates('1,1/e','1,1/e','q2','q2')
+//
+// palindromoPar.addArrowToStates('e,0/0','epsilon,0/0','q0','q1')
+// palindromoPar.addArrowToStates('e,1/1','epsilon,1/1','q0','q2')
+// palindromoPar.addArrowToStates('1,1/e','1,1/e','q1','q2')
+// palindromoPar.addArrowToStates('0,0/e','0,0/e','q2','q1')
+// palindromoPar.addArrowToStates('e,Z0/Z0','e,Z0/Z0','q1','q3')
+// palindromoPar.addArrowToStates('e,Z0/Z0','e,Z0/Z0','q2','q3')
+//
+// console.log(palindromoPar.match("01100"));
+// pda.setAlphabet("(,)")
+// pda.addState("q0","q0",true, true)
+// pda.addState("q1","q1",false, false)
+//
+// pda.addArrowToStates("e,e/$","e,e/$","q0","q1")
+// pda.addArrowToStates("(,e/*","(,e/*","q1","q1")
+// pda.addArrowToStates("),*/e","),*/e","q1","q1")
+// pda.addArrowToStates("e,$/e","e,$/e","q1","q0")
+//
+// console.log("AQUi------------------------");
+//
+// let stack = new Stack();
+// stack.push("z0")
+// let states =pda.clausura(pda.getInitialState(),stack)
+// console.log(states);
+// console.log("afuera");
+// console.log(stack);
+// console.log(pda.consume("(()))", states,stack));
 
-
-frag.appendChild(select);
-div.appendChild(frag);
-*/
+//---------------------
 let listOfExamples = getDFAs();
 var select = document.getElementById('first-select');
 var select2 = document.getElementById('second-select');
@@ -96,6 +137,8 @@ function draw() {
               afn.removeEdgeFromArray(a)
             }else if(NFAERadio.checked){
               afn_e.removeEdgeFromArray(a)
+            }else if(pdaRadio.checked){
+              pda.removeEdgeFromArray(a)
             }
           }
           for(let a of data.nodes){
@@ -105,6 +148,8 @@ function draw() {
               afn.removeStateFromArray(a);
             }else if(NFAERadio.checked){
               afn_e.removeStateFromArray(a)
+            }else if(pdaRadio.checked){
+              pda.removeStateFromArray(a)
             }
           }
           callback(data);
@@ -144,6 +189,8 @@ function draw() {
               afn.removeEdgeFromArray(a)
             }else if(NFAERadio.checked){
               afn_e.removeEdgeFromArray(a)
+            }else if(pdaRadio.checked){
+              pda.removeEdgeFromArray(a)
             }
           }
           for(let a of data.nodes){
@@ -153,6 +200,8 @@ function draw() {
               afn.removeStateFromArray(a);
             }else if(NFAERadio.checked){
               afn_e.removeStateFromArray(a)
+            }else if(pdaRadio.checked){
+              pda.removeStateFromArray(a)
             }
           }
           //afd.removeEdgeFromArray(data.id)
@@ -216,6 +265,8 @@ function saveNodeData(data, callback) {
       }else if(NFAERadio.checked){
         //console.log("nfae")
         afn_e.addState(data.label,data.id,initial,final);
+      }else if(pdaRadio.checked){
+        pda.addState(data.label, data.id, initial, final)
       }
     }else {
       if(DFARadio.checked){
@@ -224,6 +275,8 @@ function saveNodeData(data, callback) {
         afn.editState(data.label,data.id,initial,final)
       }else if(NFAERadio.checked){
         afn_e.editState(data.label,data.id,initial,final);
+      }else if(pdaRadio.checked){
+
       }
     }
     clearNodePopUp();
@@ -276,6 +329,8 @@ function saveEdgeData(data, callback) {
         afn.addArrowToStates(data.label, data.id,data.from, data.to)
       }else if(NFAERadio.checked){
         afn_e.addArrowToStates(data.label, data.id,data.from, data.to)
+      }else if(pdaRadio){
+        pda.addArrowToStates(data.label, data.id, data.from, data.to)
       }
     }else{
       if(DFARadio.checked){
@@ -298,6 +353,7 @@ function init() {
   afn = new AFN()
   afd = new AFD()
   afn_e = new AFNE()
+  pda = new PDA()
   evaluateButtonApperance();
   populateSelects();
 }catch(err){
@@ -321,6 +377,8 @@ input.addEventListener('input', function() {
     afn.setAlphabet(input.value)
   }else if(NFAERadio.checked){
     afn_e.setAlphabet(input.value)
+  }else if(pdaRadio.checked){
+    pda.setAlphabet(input.value)
   }
 })
 
@@ -336,6 +394,8 @@ function handleClick() {
     }else if(NFAERadio.checked){
       console.log("Entro nfae")
       result =afn_e.consume(document.getElementById('W').value,afn_e.clausura(afn_e.getInitialState()))
+    }else if(pdaRadio.checked){
+      result = pda.match(document.getElementById('W').value)
     }
     if(result){
       document.getElementById('message').style.color = "green";
@@ -356,9 +416,11 @@ function evaluateButtonApperance(){
   document.getElementById('fromDFAToRegexButton').style.display="none";
   document.getElementById('saveButton').style.display="none";
   document.getElementById('regExToNFAEButton').style.display="none";
+  document.getElementById('minimizarButton').style.display="none";
   if(DFARadio.checked){
     document.getElementById('fromDFAToRegexButton').style.display="block";
     document.getElementById('saveButton').style.display="block";
+    document.getElementById('minimizarButton').style.display="block";
   }else if(NFARadio.checked){
     document.getElementById('execFromNFAToDFAButton').style.display="block";
     document.getElementById('fromDFAToRegexButton').style.display="block";
@@ -377,6 +439,7 @@ radios.forEach(x => (
     afn = new AFN()
     afd = new AFD()
     afn_e = new AFNE()
+    pda = new PDA()
     data={
       nodes:[],
       edges:[]
@@ -498,7 +561,11 @@ regExToNFAEButton.addEventListener('click', ()=> {
 document.getElementById('view-Button1').addEventListener('click', () => {
   var value = select.options[select.selectedIndex].value;
   let automata = listOfExamples[value]
-  data = null;
+  data = {
+    nodes:[],
+    edges:[]
+  };
+  draw()
   data = automata.toDataSet();
   NFAERadio.checked = false
   DFARadio.checked=true
@@ -513,7 +580,11 @@ document.getElementById('view-Button1').addEventListener('click', () => {
 document.getElementById('view-Button2').addEventListener('click', () => {
   var value = select2.options[select2.selectedIndex].value;
   let automata = listOfExamples[value]
-  data = null;
+  data = {
+    nodes:[],
+    edges:[]
+  };
+  draw()
   data = automata.toDataSet();
   NFAERadio.checked = false
   DFARadio.checked=true
@@ -531,7 +602,11 @@ document.getElementById('union-Button').addEventListener('click', () =>{
   let automata2 = listOfExamples[value2]
 
   let newAutomata=unionAutomaton(automata1,automata2)
-  data = null;
+  data = {
+    nodes:[],
+    edges:[]
+  };
+  draw()
   data = newAutomata.toDataSet();
   NFAERadio.checked = false
   DFARadio.checked=true
@@ -550,7 +625,11 @@ document.getElementById('interseccion-Button').addEventListener('click', () =>{
   let automata2 = listOfExamples[value2]
 
   let newAutomata=intersectionAutomaton(automata1,automata2)
-  data = null;
+  data = {
+    nodes:[],
+    edges:[]
+  };
+  draw()
   data = newAutomata.toDataSet();
   NFAERadio.checked = false
   DFARadio.checked=true
@@ -569,7 +648,11 @@ document.getElementById('direfencia-Button').addEventListener('click', () =>{
   let automata2 = listOfExamples[value2]
 
   let newAutomata=differenceAutomaton(automata1,automata2)
-  data = null;
+  data = {
+    nodes:[],
+    edges:[]
+  };
+  draw()
   data = newAutomata.toDataSet();
   NFAERadio.checked = false
   DFARadio.checked=true
@@ -586,7 +669,11 @@ document.getElementById('complemento-Button').addEventListener('click', () =>{
   let automata1 = listOfExamples[value1]
 
   let newAutomata=complementAutomaton(automata1)
-  data = null;
+  data = {
+    nodes:[],
+    edges:[]
+  };
+  draw()
   data = newAutomata.toDataSet();
   NFAERadio.checked = false
   DFARadio.checked=true
@@ -604,3 +691,20 @@ document.getElementById('automata-cancelButton').addEventListener('click', () =>
 document.getElementById('saveButton').addEventListener('click', () => {
   listOfExamples.push(afd)
 });
+
+document.getElementById('minimizarButton').addEventListener('click', () => {
+  let nuevo = setReducedTable(afd);
+  data = {
+    nodes:[],
+    edges:[]
+  };
+  draw()
+  data = nuevo.toDataSet();
+  NFAERadio.checked = false
+  DFARadio.checked=true
+  NFARadio.checked=false
+  evaluateButtonApperance()
+  input.value = Array.from(nuevo.alphabet).join(",");
+  afd=nuevo;
+  draw()
+})

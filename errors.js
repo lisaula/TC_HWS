@@ -27,3 +27,8 @@ export class noArrowError extends Error {
         super(`The state '${stateName}' has no associated arrow '${a}'`)
     }
 }
+export class NotValidWordError extends Error {
+    constructor(word) {
+        super(`The word: '${word}' is not valid.`)
+    }
+}
