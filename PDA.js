@@ -4,6 +4,8 @@ import DFAre from "./DFA-re.js"
 import Stack from "./stack.js"
 const epsilon = "e"
 export default class PDA extends Automata{
+  stack=[]
+  produced=[]
   constructor(){
     super()
   }
@@ -25,12 +27,12 @@ export default class PDA extends Automata{
     if(!toState)
       throw new StateNotFoundError(toStateName)
 
-    let labelInfo = this.getLabelInfo(name);
-    if(this.arrowNameExistInAlphabet(labelInfo[0])){
+    //let labelInfo = this.getLabelInfo(name);
+    //if(this.arrowNameExistInAlphabet(labelInfo[0])){
       const arrow = new Arrow(name, id, fromState, toState)
       fromState.addRow(arrow)
       this.edges.push(arrow)
-    }
+    //}
   }
   arrowNameExistInAlphabet(name){
     name.split("|").forEach(c => {
@@ -119,7 +121,7 @@ export default class PDA extends Automata{
 
   clausura2(state,top){
 		let states = []
-		states.push({epsilonState: state, pushPop: 'epsilon,epsilon/epsilon'})
+		states.push({epsilonState: state, pushPop: 'e,e/e'})
 		state.arrows.filter(x => x.ableToPop(epsilon,top) || x.ableToPop(epsilon,epsilon)).map(f => {
 			let epsilonState = this.findState(f.to.name)
 			states.push({epsilonState: epsilonState, pushPop: f.name})
@@ -129,10 +131,11 @@ export default class PDA extends Automata{
 		return Array.from(new Set(states))
 	}
 
+  setInitialStackVal(n){
+    this.stack.push(n)
+  }
   match(w){
-		let stack = []
-		stack.push('Z0')
-		let finalStates = this.matchStates(w,[this.getInitialState()],stack)
+		let finalStates = this.matchStates(w,[this.getInitialState()],this.stack)
 		if (finalStates.length==0) return false
 		console.log("finalStates: %o", finalStates)
 		let finalState = finalStates.find(x => x!=undefined && x.isFinal)
@@ -140,7 +143,7 @@ export default class PDA extends Automata{
 		return finalState.isFinal;
 	}
 
-  matchStates(w,currentStates,stack){
+  matchStates2(w,currentStates,stack){
 		console.log("descripcion instantanea: w: %s, currentStates: %o, stack: %o",w,currentStates,stack)
 		let clausuras = []
 		currentStates.forEach(currentState => {
@@ -156,6 +159,8 @@ export default class PDA extends Automata{
 			let returnValues = []
 
 			clausuras.forEach(claus => {
+        console.log("Claus abajo. S: %o W:%s",stack,w);
+        console.log(claus);
 				let nextStack = Array.from(stack)
 				let popEpsilonValue = claus.pushPop.split('/')[0].split(',')[1]
 				let pushEpsilonValues = claus.pushPop.split('/')[1].split(',')
@@ -165,27 +170,88 @@ export default class PDA extends Automata{
 					if (pushEpsilonValues[i]!=epsilon)
 						nextStack.push(pushEpsilonValues[i])
 				}
-				let transitions = claus.epsilonState.arrows.filter(x => x.ableToPop(a,stack[stack.length-1]) || x.ableToPop(a,epsilon))
-				transitions.forEach(t => {
+				let transitions = claus.epsilonState.arrows.filter(x => x.ableToPop(a,stack[stack.length-1]) || x.ableToPop(a,epsilon) || x.ableToPop(epsilon,stack[stack.length-1]))
+        console.log("transitions %o",transitions);
+        transitions.forEach(t => {
 					// statesTo.add(this.(t.to))
 					let popValue = t.name.split('/')[0].split(',')[1]
+          let transWith = t.name.split('/')[0].split(',')[0]
 					let pushValues = t.name.split('/')[1].split(',')
 					if (popValue!=epsilon) nextStack.pop()
 					for (var i = pushValues.length - 1; i >= 0; i--) {
 						if (pushValues[i]!=epsilon)
 							nextStack.push(pushValues[i])
 					}
-					returnValues = returnValues.concat(returnValues,this.matchStates(w.substring(1,w.length),[this.findState(t.to.name)],nextStack))
-				})
+          t.touched=true
+          if(transWith!=epsilon){
+					       returnValues = returnValues.concat(returnValues,this.matchStates(w.substring(1,w.length),[this.findState(t.to.name)],nextStack))
+          }else{
+            returnValues = returnValues.concat(returnValues,this.matchStates(w,[this.findState(t.to.name)],nextStack))
+          }
+          t.touched=false
+        })
 			})
 			// if (returnValues.length>0)
+        console.log("retorno %o con w: %s",returnValues,w );
 				return Array.from(new Set(returnValues))
 			// if (statesTo.size==0)
 			// 	throw new NextTransitionError(a)
 			// return this.matchStates(w.substring(1,w.length),Array.from(statesTo),new Array(stack))
 		}
+    console.log("regreso menor que 0 %o con w: %s",(clausuras.map(y => y.epsilonState)).find(x => x.isFinal), w);
 		return (clausuras.map(y => y.epsilonState)).find(x => x.isFinal)
 	}
+
+  matchStates(w,currentStates,stack){
+  console.log("descripcion instantanea: w: %s, currentStates: %o, stack: %o",w,currentStates,stack)
+  let clausuras = []
+  currentStates.forEach(currentState => {
+    let tempClausuras = this.clausura2(currentState,stack[stack.length-1])
+    tempClausuras.forEach(claus => clausuras.push(claus))
+  })
+
+  console.log("clausuras ", clausuras)
+
+  if (w.length>0) {
+    let a = w.charAt(0)
+    let returnValues = []
+
+    clausuras.forEach(claus => {
+      let nextStack = Array.from(stack)
+      let popEpsilonValue = claus.pushPop.split('/')[0].split(',')[1]
+      let pushEpsilonValues = claus.pushPop.split('/')[1].split(',')
+
+      if (popEpsilonValue!=epsilon) nextStack.pop()
+      for (var i = pushEpsilonValues.length - 1; i >= 0; i--) {
+        if (pushEpsilonValues[i]!=epsilon)
+          nextStack.push(pushEpsilonValues[i])
+      }
+      let transitions = claus.epsilonState.arrows.filter(x => x.ableToPop(a,stack[stack.length-1])
+        || x.ableToPop(a,epsilon)
+        || x.ableToPop(epsilon,stack[stack.length-1]))
+      console.log("transitions")
+      console.log(transitions)
+      transitions.forEach(t => {
+        let popValue = t.name.split('/')[0].split(',')[1]
+        let pushValues = t.name.split('/')[1].split(',')
+        if (popValue!=epsilon) nextStack.pop()
+        for (var i = pushValues.length - 1; i >= 0; i--) {
+          if (pushValues[i]!=epsilon)
+            nextStack.push(pushValues[i])
+        }
+        console.log("llego aqui")
+        if(t.name.split('/')[0].split(',')[0]!=epsilon)
+          returnValues = returnValues.concat(returnValues,this.matchStates(w.substring(1,w.length),[this.findState(t.to.name)],nextStack))
+        else
+          returnValues = returnValues.concat(returnValues,this.matchStates(w,[this.findState(t.to.name)],nextStack))
+      })
+    })
+    console.log("returnValues")
+    console.log(returnValues)
+    return Array.from(new Set(returnValues))
+  }
+  return (clausuras.map(y => y.epsilonState)).find(x => x.isFinal)
+}
 
   copyStack(stack){
     return stack.copy(stack)
@@ -288,4 +354,121 @@ export default class PDA extends Automata{
     return this.states.filter(e => e.isInitial)[0]
   }
 
+  getStepOne(){
+		let initialState = this.getInitialState()
+		let finalStates = this.states.filter(x => x.isFinal)
+		let produced = []
+    let ret =""
+		finalStates.forEach(state => {
+			//console.log('A -> ['+initialState.name+'Z0'+state.name+']')
+      let produccion ='['+initialState.name+' Z0 '+state.name+']'
+      ret += "A->"+produccion+"\n"
+      this.produced.push(produccion)
+		})
+		return ret
+	}
+
+  getStepTwo(){
+    let ret = ""
+
+		for (let transition of this.edges) {
+      let values = transition.name.split('/')
+  		let leftValue = values[0].split(',')
+  		let rightValue = values[1].split(',')
+			if (rightValue.length == 0 || rightValue[0]==epsilon) {
+				let from = transition.from.name;
+				let to = transition.to.name;
+				ret += "[" + from + " " + leftValue[1] + " " + to + "]->" + leftValue[0] + "\n";
+				this.produced.push("[" + from + " " + leftValue[1] + " " + to + "]");
+			}
+		}
+
+    return ret
+  }
+
+  getStepThree(){
+    let ret = ""
+
+		for(let transition of this.edges){
+      let values = transition.name.split('/')
+  		let leftValue = values[0].split(',')
+  		let rightValue = values[1].split(',')
+			if(rightValue.length > 0 && rightValue[0] != epsilon){
+				let m = rightValue.length
+				let permut = this.permut(m);
+				let from = transition.from.name;
+				for(let row of permut){
+					//console.log(row);
+					ret += "[" + from + " " + leftValue[1] + " " + row[m-1] + "]" + "->" + leftValue[0];
+					this.produced.push("[" + from + " " + leftValue[1] + " " + row[m-1] + "]");
+
+					for(let i = 0; i < m; i++){
+						let p1 = from;
+						if(i > 0)
+							p1 = row[i-1];
+						let p2 = row[i];
+
+
+						ret += "[" + p1 + " " + rightValue[i] + " " + p2 + "]"
+						this.produced.push("[" + p1 + " " + rightValue[i] + " " + p2 + "]")
+					}
+
+					ret += "\n";
+				}
+			}
+		}
+
+  return ret
+  }
+
+  permut(columns) {
+		let states_count = this.states.length;
+		let rows_count = Math.pow(states_count, columns);
+		let states_label = this.states.map(x => x.name);
+
+		let ret = [];
+		for (let i = 0; i < rows_count; i++) {
+			ret.push([])
+			for (let j = 0; j < columns; j++) {
+				ret[i].push("")
+			}
+		}
+
+		for (let i = 0; i < columns; i++) {
+			let incidences = Math.pow(states_count, columns - (i + 1));
+			let current_state = 0;
+			for (let j = 0; j < rows_count; j++) {
+				if (j > 0 && j % incidences == 0)
+					current_state++;
+				if (current_state >= states_count)
+					current_state = 0;
+				ret[j][i] = states_label[current_state];
+			}
+		}
+
+		return ret;
+	}
+
+	toCFG() {
+		this.produced = [];
+		let ret = "";
+		ret += this.getStepOne();
+		ret += this.getStepTwo();
+		ret += this.getStepThree();
+
+		/*this.produced = removeDuplicates(this.produced);
+		let current_prod = 66;
+		for(let prod of this.produced){
+			ret = ret.split(prod).join(String.fromCharCode(current_prod++));
+		}*/
+
+		return ret;
+  }
+
+}
+
+function removeDuplicates(array){
+  let nuevo = [];
+	array.forEach( x => nuevo.indexOf(x) < 0 ? nuevo.push(x) : null);
+  return nuevo;
 }

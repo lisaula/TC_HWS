@@ -86,6 +86,21 @@
     padding:10px;
     text-align: center;
 	}
+	#Gramatica-PopUp{
+	display:none;
+	position:absolute;
+	top:350px;
+	left:170px;
+	z-index:299;
+	width:300px;
+	height:300px;
+	background-color: #f9f9f9;
+	border-style:solid;
+	border-width:3px;
+	border-color: #5394ed;
+	padding:10px;
+	text-align: center;
+	}
   #edge-popUp {
     display:none;
     position:absolute;
@@ -101,7 +116,15 @@
     padding:10px;
     text-align: center;
   }
-  #execButton,#saveButton,#minimizarButton,#regExToNFAEButton,#execFromNFAToDFAButton,#fromDFAToRegexButton,#execFromNFAEToDFAButton {
+	#Textarea{
+		align-self: middle;
+		width: 250px;
+		height: 250px;
+	}
+	#form-gramatica{
+		align-items: flex-start;
+	}
+  #execButton,#saveButton,#PDAToGLCButton,#minimizarButton,#regExToNFAEButton,#execFromNFAToDFAButton,#fromDFAToRegexButton,#execFromNFAEToDFAButton {
     background-color: #4CAF50; /* Green */
     margin-top: 10px;
     margin-bottom: 15px;
@@ -112,6 +135,9 @@
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
+	}
+	#gramatica-toPDAButton{
+		margin: 10px;
 	}
 	#message {
 			color:green;
@@ -134,6 +160,7 @@
 			<input type="radio" name="automata" id="regexRadio"value="Regular Expression">Regular Expression<br>
 			<input type="radio" name="automata" id="operaciones"value="Operaciones con Automatas"> Operaciones con automatas<br>
 			<input type="radio" name="automata" id="pdaRadio" value="PDA"> PDA<br>
+			<input type="radio" name="automata" id="GLCRadio" value="PDA"> GLC<br>
 		</form>
     <input type="button" id="execButton" value="Exec">
 		<input type="button" id="saveButton" value="Save">
@@ -142,7 +169,9 @@
 		<input type="button" id="execFromNFAToDFAButton" value="From NFA to DFA">
 		<input type="button" id="execFromNFAEToDFAButton" value="From E-NFA to DFA">
 		<input type="button" id="regExToNFAEButton" value="From RegEx to E-NFA">
+		<input type="button" id="PDAToGLCButton" value="From PDA to CFG">
 		<div id="message"></div>
+		
     <div id="node-popUp">
       <span id="node-operation">node</span> <br>
       <table style="margin:auto;">
@@ -178,6 +207,15 @@
       <input type="button" value="complemento" id="complemento-Button" />
 			<input type="button" value="cancel" id="automata-cancelButton" />
     </div>
+
+		<div id="Gramatica-PopUp">
+      <span id="automata-operation">Gramatica</span> <br>
+			<form id="form-gramatica">
+				<textarea id="Textarea"></textarea>
+	      <input type="button" value="To Pda" id="gramatica-toPDAButton" />
+				<input type="button" value="cancel" id="gramatica-cancelButton" />
+			</form>
+		</div>
 
     <div id="edge-popUp">
       <span id="edge-operation">edge</span> <br>

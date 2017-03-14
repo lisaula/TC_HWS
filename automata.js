@@ -165,6 +165,7 @@ export class Arrow{
     this.name =name
     this.from = from
     this.to = to
+    this.touched = false
   }
 
   validate(a){
@@ -226,7 +227,7 @@ export class Arrow{
 		let values = this.name.split('/')
 		let leftValue = values[0].split(',')
 		let rightValue = values[1].split(',')
-		return leftValue[0] ==  symbol && leftValue[1] == popvalue
+		return leftValue[0] ==  symbol && leftValue[1] == popvalue && !this.touched
 	}
 
   validateEpsilonPDA(){

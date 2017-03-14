@@ -23,36 +23,33 @@ var NFAERadio = document.getElementById('NFAE');
 var regexRadio = document.getElementById('regexRadio')
 var operacionesRadio = document.getElementById('operaciones');
 var pdaRadio = document.getElementById('pdaRadio');
+var glcRadio = document.getElementById('GLCRadio');
 //---------------------
 //console.log(setReducedTable(afd));
 import PDA from "./PDA.js"
 
 let pda =undefined;// new PDA()
-// const palindromoPar = new PDA()
-// palindromoPar.setAlphabet("0,1")
-// palindromoPar.addState('q0','q0',true)
-// palindromoPar.addState('q1',"q1")
-// palindromoPar.addState('q2',"q2")
-// palindromoPar.addState('q3',"q3",false,true)
-//
-// palindromoPar.addArrowToStates('0,Z0/0,Z0','0,Z0/0,Z0','q0','q0')
-// palindromoPar.addArrowToStates('0,0/0,0','0,0/0,0','q0','q0')
-// palindromoPar.addArrowToStates('1,0/1,0','1,0/1,0','q0','q0')
-// palindromoPar.addArrowToStates('1,1/1,1','1,1/1,1','q0','q0')
-// palindromoPar.addArrowToStates('1,Z0/Z0','1,Z0/Z0','q0','q0')
-// palindromoPar.addArrowToStates('0,1/0,1','0,1/0,1','q0','q0')
-//
-// palindromoPar.addArrowToStates('0,0/e','0,0/e','q1','q1')
-// palindromoPar.addArrowToStates('1,1/e','1,1/e','q2','q2')
-//
-// palindromoPar.addArrowToStates('e,0/0','epsilon,0/0','q0','q1')
-// palindromoPar.addArrowToStates('e,1/1','epsilon,1/1','q0','q2')
-// palindromoPar.addArrowToStates('1,1/e','1,1/e','q1','q2')
-// palindromoPar.addArrowToStates('0,0/e','0,0/e','q2','q1')
-// palindromoPar.addArrowToStates('e,Z0/Z0','e,Z0/Z0','q1','q3')
-// palindromoPar.addArrowToStates('e,Z0/Z0','e,Z0/Z0','q2','q3')
-//
-// console.log(palindromoPar.match("01100"));
+/*const palindromoPar = new PDA()
+palindromoPar.setAlphabet("0,1")
+palindromoPar.addState('q0','q0',true)
+palindromoPar.addState('q1',"q1")
+palindromoPar.addState('q2',"q2",false,true)
+
+palindromoPar.addArrowToStates('0,Z0/0,Z0','0,Z0/0,Z0','q0','q0')
+palindromoPar.addArrowToStates('0,0/0,0','0,0/0,0','q0','q0')
+palindromoPar.addArrowToStates('1,0/1,0','1,0/1,0','q0','q0')
+palindromoPar.addArrowToStates('1,1/1,1','1,1/1,1','q0','q0')
+palindromoPar.addArrowToStates('1,Z0/1,Z0','1,Z0/1,Z0','q0','q0')
+palindromoPar.addArrowToStates('0,1/0,1','0,1/0,1','q0','q0')
+
+palindromoPar.addArrowToStates('0,0/e','0,0/e','q1','q1')
+palindromoPar.addArrowToStates('1,1/e','1,1/e','q1','q1')
+
+palindromoPar.addArrowToStates('e,0/0','epsilon,0/0','q0','q1')
+palindromoPar.addArrowToStates('e,1/1','epsilon,1/1','q0','q1')
+palindromoPar.addArrowToStates('e,Z0/Z0','e,Z0/Z0','q1','q2')
+
+console.log(palindromoPar.match("0110"));*/
 // pda.setAlphabet("(,)")
 // pda.addState("q0","q0",true, true)
 // pda.addState("q1","q1",false, false)
@@ -395,6 +392,7 @@ function handleClick() {
       console.log("Entro nfae")
       result =afn_e.consume(document.getElementById('W').value,afn_e.clausura(afn_e.getInitialState()))
     }else if(pdaRadio.checked){
+      pda.setInitialStackVal("Z0")
       result = pda.match(document.getElementById('W').value)
     }
     if(result){
@@ -417,6 +415,7 @@ function evaluateButtonApperance(){
   document.getElementById('saveButton').style.display="none";
   document.getElementById('regExToNFAEButton').style.display="none";
   document.getElementById('minimizarButton').style.display="none";
+  document.getElementById('PDAToGLCButton').style.display="none";
   if(DFARadio.checked){
     document.getElementById('fromDFAToRegexButton').style.display="block";
     document.getElementById('saveButton').style.display="block";
@@ -432,7 +431,18 @@ function evaluateButtonApperance(){
     document.getElementById('Automata-PopUp').style.display= 'block';
     populateSelects();
   }
+  else if(pdaRadio.checked){
+    document.getElementById('PDAToGLCButton').style.display="block";
+  }
+  else if(glcRadio.checked){
+    document.getElementById('Gramatica-PopUp').style.display= 'block';
+  }
 }
+
+document.getElementById('gramatica-cancelButton').addEventListener('click', () => {
+  document.getElementById('Gramatica-PopUp').style.display= 'none';
+});
+
 let radios = document.getElementsByName('automata');
 radios.forEach(x => (
   x.onclick = function(){
@@ -708,3 +718,30 @@ document.getElementById('minimizarButton').addEventListener('click', () => {
   afd=nuevo;
   draw()
 })
+
+import {ToPDA} from "./GLCToPDA.js"
+
+
+
+document.getElementById('gramatica-toPDAButton').addEventListener('click', () => {
+  let gramatica =document.getElementById('Textarea').value
+  console.log("%s and %s",gramatica);
+  pda = ToPDA(gramatica)
+  data = {
+    nodes: [],
+    edges: []
+  }
+  draw()
+  data = pda.toDataSet()
+  glcRadio.checked=false
+  pdaRadio.checked=true
+  evaluateButtonApperance()
+  draw()
+});
+document.getElementById('PDAToGLCButton').addEventListener('click', () => {
+  let gramatica =document.getElementById('Textarea').value=pda.toCFG()
+  glcRadio.checked=true
+  pdaRadio.checked=false
+  evaluateButtonApperance()
+  draw()
+});
